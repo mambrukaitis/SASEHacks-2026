@@ -1,4 +1,5 @@
 import json
+import aldiScraper, tjScraper
 import re
 
 try:
@@ -15,9 +16,11 @@ except FileNotFoundError:
 def product_to_data(product):
     return publix_search_json(product)
 
+def aldi():
+    aldiScraper.aldiSearch()
 
-
-
+def tj():
+    tjScraper.tjSearch()
 
 def publix_search_json(product, brand=""):
     """
