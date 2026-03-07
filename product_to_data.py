@@ -33,6 +33,16 @@ def aldi_search(search: str) -> dict:
     for p in top3:
         name = p["name"] + p["brandName"]
         price = p["price"]["amount"] / 100  
+    
+    return
+    
+def TJ_search(search: str) -> dict:
+
+    return
+
+def walmart_search(search: str) -> dict:
+    
+    return
 
 def publix_search_json(product, brand=""):
     product = product.lower()

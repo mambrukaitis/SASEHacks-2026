@@ -52,10 +52,29 @@ data = response.json()
 products = data["data"]["products"]["items"]
 
 
-for i, product in enumerate(products):
-    print(f"Product {i}: {product.get('item_title', 'Unknown')}")
-    print("Keys available:", list(product.keys()))
-    print()
+for product in products:
+    sku = product.get("sku")  # get the SKU to fetch full details
+    name = product.get("item_title") or product.get("name")
+    price = product.get("retail_price", "N/A")
+    
+    # Now fetch full product details
+    detail_url = f"https://api.traderjoes.com/products/{sku}"
+    detail_response = requests.get(detail_url)
+    detail_data = detail_response.json()
+    
+    # Get category hierarchy from full details
+    categories = detail_data.get("data", {}).get("product", {}).get("category_hierarchy", [])
+    category_names = [c["name"] for c in categories]
+
+    print(f"Product: {name}")
+    print(f"Price: {price}")
+    print(f"Categories: {', '.join(category_names) if category_names else 'N/A'}")
+    print("-" * 40)
+
+# for i, product in enumerate(products):
+#     print(f"Product {i}: {product.get('item_title', 'Unknown')}")
+#     print("Keys available:", list(product.keys()))
+#     print()
 
 # sortedProducts = sorted(products, key=lambda p: p["retail_price"])
 
