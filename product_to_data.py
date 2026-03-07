@@ -1,6 +1,8 @@
 import json
 #import aldiScraper, tjScraper
 import re
+import nltk
+
 
 try:
     with open("publix_data.json", "r", encoding="utf-8") as f:
@@ -21,8 +23,6 @@ def product_to_data(product):
 #def tj():
     tjScraper.tjSearch()
 
-import re
-import nltk
 
 IGNORE_WORDS = {
     "oz","lb","lbs","g","kg","ml","l","ct","count","pack","pk",
@@ -114,12 +114,78 @@ def publix_search_json(product, brand=""):
                 break
 
     return brand_matches + other_matches
+
+def price_to_float(price):
+    if not price:
+        return float("inf")
+    return float(price.replace("$", ""))
+
+def category_matches(query_category, result_category):
+    """
+    Smarter category match:
+    - Single-word query: matches if the word appears as the main noun in result_category
+    - Multi-word query: matches if all query words appear consecutively at the end of result_category
+    """
+    if not query_category or not result_category:
+        return False
+
+    # Clean and tokenize
+    qc_tokens = re.sub(r'[^a-z0-9 ]', '', query_category.lower()).split()
+    rc_tokens = re.sub(r'[^a-z0-9 ]', '', result_category.lower()).split()
+
+    # Remove modifiers from result category
+    main_tokens = [t for t in rc_tokens if t not in IGNORE_MODIFIERS]
+
+    # Single-word query
+    if len(qc_tokens) == 1:
+        return qc_tokens[0] in main_tokens[-len(qc_tokens):]
+
+    # Multi-word query
+    else:
+        query_slice = qc_tokens  # all words in the query
+        # Check if query slice matches last words in main_tokens
+        if main_tokens[-len(query_slice):] == query_slice:
+            return True
+        # Fallback: query slice appears anywhere consecutively in main_tokens
+        for i in range(len(main_tokens) - len(query_slice) + 1):
+            if main_tokens[i:i + len(query_slice)] == query_slice:
+                return True
+
+    return False
+
+def publix_search_limited(product, brand=""):
+
+    results = publix_search_json(product, brand)
+
+    if not results:
+        return []
+
+    # determine category of the user's query
+    query_category = extract_category(product)
+
+    # if fewer than 10 results, filter by category match
+    if len(results) > 5:
+        filtered = [
+            r for r in results
+            if category_matches(query_category, r.get("category"))
+        ]
+        # fallback if filtering removed everything
+        if len(filtered) > 5:
+            return sorted(filtered[:5], key=lambda x: price_to_float(x.get("price")))
+        else:
+            if filtered:
+                return sorted(filtered, key=lambda x: price_to_float(x.get("price")))
+            return sorted(results[:5], key=lambda x: price_to_float(x.get("price"))) if len(results) > 5 else sorted(results, key=lambda x: price_to_float(x.get("price")))
+
+    # otherwise return 10 cheapest
+    results_sorted = sorted(results, key=lambda x: price_to_float(x.get("price")))
+    return results_sorted[:5]
 if __name__ == "__main__":
     
 
     user_term = input("\nEnter a product name to search: ")
     user_brand = input("Enter a brand to prioritize (optional): ")
-    user_results = publix_search_json(user_term, user_brand)
+    user_results = publix_search_limited(user_term, user_brand)
 
     print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
     for r in user_results:
