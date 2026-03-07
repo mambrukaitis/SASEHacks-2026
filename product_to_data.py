@@ -11,7 +11,7 @@ except json.JSONDecodeError as e:
 except FileNotFoundError:
     print("File not found or path is incorrect")
     raise
-print("updates")
+
 def product_to_data(product):
     return publix_search_json(product)
 
