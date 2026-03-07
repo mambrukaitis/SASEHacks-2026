@@ -1,112 +1,108 @@
 import json
-import requests
 import re
+import nltk
+from nltk import pos_tag, word_tokenize
 
+# Ensure NLTK can find its data
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+# Load Publix data
 try:
     with open("publix_data.json", "r", encoding="utf-8") as f:
         PUBLIX_PRODUCTS = json.load(f)
-except json.JSONDecodeError as e:
-    print("JSON decode error:", e)
+except Exception as e:
+    print("Error loading JSON:", e)
     raise
-except FileNotFoundError:
-    print("File not found or path is incorrect")
-    raise
-
 
 def product_to_data(product):
     return publix_search_json(product)
 
-def aldi_search(search: str) -> dict:
+def clean_token(token):
+    """Normalize token: lowercase, strip punctuation/apostrophes."""
+    return re.sub(r'[^A-Za-z0-9]', '', token).lower()
 
-    url = "https://api.aldi.us/v3/product-search?currency=USD&serviceType=pickup&q=" + search + "&limit=60&offset=0&sort=relevance&testVariant=A&servicePoint=474-109"
+def extract_main_noun(text, brand_words=None):
+    """
+    Extract the main noun(s) from product title, skipping brand tokens and modifiers.
+    Returns compound noun if consecutive nouns found.
+    """
+    tokens = word_tokenize(text)
+    pos_tags = pos_tag(tokens)
 
-    headers = {
-        "accept-language": "en-US",
-        "referer": "https://www.aldi.us/",
-        "sec-ch-ua": '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+    brand_words_lower = [clean_token(w) for w in brand_words] if brand_words else []
+
+    # Common adjectives/modifiers to skip
+    modifiers = {
+        'large', 'small', 'medium', 'fat', 'lowfat', 'reduced', 'free',
+        'min', 'minimum', 'low', 'active', 'whole', 'skim', 'nonfat'
     }
 
-    response = requests.get(url, headers=headers)
+    main_nouns = []
+    for word, pos in pos_tags:
+        token_clean = clean_token(word)
+        if token_clean in brand_words_lower or token_clean in modifiers or pos in ('CD',):
+            continue
+        if pos.startswith('NN'):
+            main_nouns.append(word)
+        elif main_nouns:  # stop if we already started a noun phrase
+            break
 
-    data = response.json()
-    products = data["data"]
-    products = [p for p in products if search in p["name"].lower()]
-    sorted_products = sorted(products, key=lambda p: p["price"]["amount"])
-
-    top3 = sorted_products[:3]
-    
-    for p in top3:
-        name = p["name"] + p["brandName"]
-        price = p["price"]["amount"] / 100  
-    
-    return
-    
-def TJ_search(search: str) -> dict:
-
-    return
-
-def walmart_search(search: str) -> dict:
-    
-    return
-
-
-
+    if main_nouns:
+        return ' '.join(main_nouns)  # combine consecutive nouns
+    else:
+        # fallback: last noun in title
+        fallback_nouns = [word for word, pos in reversed(pos_tags)
+                          if pos.startswith('NN') and clean_token(word) not in brand_words_lower]
+        return ' '.join(fallback_nouns[:2]) if fallback_nouns else None
 
 def publix_search_json(product, brand=""):
-    """
-    Searches products for a given name with optional brand prioritization.
-    Matches only if the consecutive words in the input appear consecutively in the product name.
-    """
-    product_phrase = re.sub(r'[^a-z0-9 ]', '', product.lower()).split()  # split input into words
-    brand = brand.lower()
+    product_phrase = re.sub(r'[^a-z0-9 ]', '', product.lower()).split()
+    brand_lower = brand.lower()
 
     brand_matches = []
     other_matches = []
 
     for item in PUBLIX_PRODUCTS:
-        # normalize JSON name
         name_words = re.sub(r'[^a-z0-9 ]', '', item.get("name", "").lower()).split()
-        if(item.get("brandName", "")):
-            brand_name = item.get("brandName", "").lower()
+        item_brand = item.get("brandName", "")
+        item_brand_lower = item_brand.lower() if item_brand else ""
 
-        
+        # Detect main noun(s), skipping brand words
+        brand_tokens = item_brand.split() if item_brand else []
+        main_noun = extract_main_noun(item.get("name", ""), brand_words=brand_tokens)
 
-        # Check if product_phrase appears consecutively in name_words
+        # Check for consecutive-word match
         for i in range(len(name_words) - len(product_phrase) + 1):
             if name_words[i:i + len(product_phrase)] == product_phrase:
                 result = {
                     "name": item.get("name"),
                     "price": item.get("priceString"),
                     "store": "Publix",
-                    "brand": item.get("brandName")
+                    "brand": item_brand,
+                    "noun": main_noun
                 }
-                if brand and brand in brand_name:
+                if brand_lower and brand_lower in item_brand_lower:
                     brand_matches.append(result)
                 else:
                     other_matches.append(result)
-                break  # stop checking this product after first match
+                break
 
     return brand_matches + other_matches
 
 if __name__ == "__main__":
-    # Example 1: hardcoded search
     search_term = "cottage cheese"
-    brand = ""  # leave empty if you don't want to prioritize a brand
+    brand = ""
     results = publix_search_json(search_term, brand)
-
     print(f"Results for '{search_term}':\n")
     for r in results:
         print(r)
 
-    # Example 2: interactive input from user
     user_term = input("\nEnter a product name to search: ")
     user_brand = input("Enter a brand to prioritize (optional): ")
     user_results = publix_search_json(user_term, user_brand)
-
     print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
     for r in user_results:
-
         print(r)
