@@ -7,7 +7,7 @@ input_files = [
     os.path.join(script_dir, "publix_data.json"),
     os.path.join(script_dir, "publix_data2.json")
 ]
-output_file = os.path.join(script_dir, "cleaned.json")
+output_file = os.path.join(script_dir, "cleaned_final.json")
 
 combined_data = []
 
