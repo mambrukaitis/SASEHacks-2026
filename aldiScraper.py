@@ -28,4 +28,4 @@ def aldiSearch():
             price = p["price"]["amount"] / 100
             print(name, price)
 
-    return
+aldiSearch()
