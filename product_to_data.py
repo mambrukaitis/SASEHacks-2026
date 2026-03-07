@@ -1,5 +1,4 @@
 import json
-import aldiScraper, tjScraper
 import re
 
 try:
@@ -16,11 +15,8 @@ except FileNotFoundError:
 def product_to_data(product):
     return publix_search_json(product)
 
-def aldi_search(search: str):
-    aldiScraper.aldiSearch()
-    
-def TJ_search(search: str) -> dict:
-    tjScraper.tjSearch()
+
+
 
 
 def publix_search_json(product, brand=""):
@@ -60,21 +56,12 @@ def publix_search_json(product, brand=""):
     return brand_matches + other_matches
 
 if __name__ == "__main__":
-    # Example 1: hardcoded search
-    search_term = "cottage cheese"
-    brand = ""  # leave empty if you don't want to prioritize a brand
-    results = publix_search_json(search_term, brand)
+    
 
-    print(f"Results for '{search_term}':\n")
-    for r in results:
-        print(r)
-
-    # Example 2: interactive input from user
     user_term = input("\nEnter a product name to search: ")
     user_brand = input("Enter a brand to prioritize (optional): ")
     user_results = publix_search_json(user_term, user_brand)
 
     print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
     for r in user_results:
-
         print(r)
