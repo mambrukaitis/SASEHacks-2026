@@ -1,6 +1,6 @@
 import json
 import requests
-
+import re
 
 try:
     with open("publix_data.json", "r", encoding="utf-8") as f:
@@ -43,9 +43,7 @@ def aldi_search(search: str) -> dict:
         price = p["price"]["amount"] / 100  
 
 
-import re
 
-import re
 
 def publix_search_json(product, brand=""):
     """
@@ -100,4 +98,5 @@ if __name__ == "__main__":
 
     print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
     for r in user_results:
+
         print(r)
