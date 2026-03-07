@@ -1,4 +1,7 @@
 import requests
+from google.cloud import aiplatform
+
+client = OpenAI(api_key="AIzaSyASojgtoURViBqokvWHEbjS5tcAsVbSKP4")
 
 def tjSearch():
   search = input("What do you want to look up? ")
@@ -33,6 +36,8 @@ def tjSearch():
           id
           name
         }
+        sales_size
+        sales_uom_description
       }
     }
   }
@@ -54,12 +59,61 @@ def tjSearch():
   data = r.json()
 
   products = data["data"]["products"]["items"]
-  category = products[0]["category_hierarchy"][-1]["name"]
 
-  for p in products:
-    if p["category_hierarchy"][-1]["name"] == category:
-      name = p["item_title"]
-      price = p["retail_price"]
-      print(name, price)
+  if not products:
+    return
+  
+  response = client.responses.create(
+        model="gemini-1.5",
+        input=f"""
+    You are given a list of grocery products with titles and prices. 
+    Only return products that are relevant to "{search}", ignoring ingredients, sauces, or unrelated items. 
+    Keep the original price and sales size.
+
+    Products: {products}
+    Return the filtered list in valid JSON format.
+    """
+    )
+
+  try:
+        filtered_products = json.loads(response.output_text)
+  except json.JSONDecodeError:
+        print("Error parsing Gemini output. Using unfiltered products.")
+        filtered_products = products
+
+  if not filtered_products:
+        print("No relevant products found after filtering.")
+        return
+
+    # Sort by price then name
+  sorted_products = sorted(
+        filtered_products,
+        key=lambda p: (p["retail_price"], p["item_title"].lower())
+    )
+
+    # Print cheapest relevant product
+  product = sorted_products[0]
+  name = product["item_title"]
+  size = f'{product["sales_size"]} {product["sales_uom_description"]}'
+  price = product["retail_price"]
+
+  print(f"{name}, {size}, ${price}")
+  
+  # category = products[0]["category_hierarchy"][-1]["name"]
+
+  # products = [p for p in products if p["category_hierarchy"][-1]["name"] == category]
+  # products = [p for p in products if not (search in ["pizza", "pasta"] and "sauce" in p["item_title"].lower())]
+
+  # sortedProducts = sorted(
+  #   products,
+  #   key=lambda p: (p["retail_price"], p["item_title"].lower())
+  # )
+
+  # name = sortedProducts[0]["item_title"]
+  # size = str(sortedProducts[0]["sales_size"]) + " " + sortedProducts[0]["sales_uom_description"]
+  # price = sortedProducts[0]["retail_price"]
+  
+  # print(name + ", " + size + " , $" + str(price))
+
 
 tjSearch()

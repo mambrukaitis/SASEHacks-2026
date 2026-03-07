@@ -19,13 +19,19 @@ def aldiSearch():
     data = response.json()
     products = data["data"]
     products = [p for p in products if search in p["name"].lower()]
-    sorted_products = sorted(products, key=lambda p: p["price"]["amount"])
+    sortedProducts = sorted(
+        products, 
+        key=lambda p: (p["price"]["amount"], p["name"].lower())
+    )   
 
-    top3 = sorted_products[:3]
+    if len(sortedProducts) != 0:   
+        name = sortedProducts[0]["name"]
+        price = sortedProducts[0]["price"]["amount"] / 100
+    
+        print(name + " , $" + str(price))
 
-    for p in top3:
-            name = p["name"] + p["brandName"]
-            price = p["price"]["amount"] / 100
-            print(name, price)
+    return
+
+
 
 aldiSearch()
