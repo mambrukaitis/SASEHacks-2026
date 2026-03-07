@@ -1,4 +1,8 @@
 import json
+<<<<<<< HEAD
+=======
+import aldiScraper, tjScraper
+>>>>>>> 9c04cf8ffafab93ffa10027b9c1c5338450324a0
 import re
 import nltk
 from nltk import pos_tag, word_tokenize
@@ -20,6 +24,7 @@ except Exception as e:
 def product_to_data(product):
     return publix_search_json(product)
 
+<<<<<<< HEAD
 def clean_token(token):
     """Normalize token: lowercase, strip punctuation/apostrophes."""
     return re.sub(r'[^A-Za-z0-9]', '', token).lower()
@@ -49,6 +54,13 @@ def extract_main_noun(text, brand_words=None):
             main_nouns.append(word)
         elif main_nouns:  # stop if we already started a noun phrase
             break
+=======
+def aldi_search(search: str):
+    aldiScraper.aldiSearch()
+    
+def TJ_search(search: str) -> dict:
+    tjScraper.tjSearch()
+>>>>>>> 9c04cf8ffafab93ffa10027b9c1c5338450324a0
 
     if main_nouns:
         return ' '.join(main_nouns)  # combine consecutive nouns
