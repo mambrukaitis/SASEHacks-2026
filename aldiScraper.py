@@ -22,6 +22,6 @@ sorted_products = sorted(products, key=lambda p: p["price"]["amount"])
 top3 = sorted_products[:3]
 
 for p in top3:
-        name = p["name"]
+        name = p["name"] + p["brand"]
         price = p["price"]["amount"] / 100
         print(name, price)
