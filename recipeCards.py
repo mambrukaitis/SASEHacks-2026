@@ -68,10 +68,6 @@ class ShoppingList:
         publix_results = product_to_data.publix_search_limited(item) or []
         aldi_results = product_to_data.aldi(item) or []
         tj_results = product_to_data.tj(item) or []
-
-        print(len(publix_results))
-        print(len(tj_results))
-        print(len(aldi_results))
     
         if  len(publix_results) == 0 and len(aldi_results) == 0 and  len(tj_results) == 0:
             return Item({}, "")  # return an empty Item instead of None
@@ -86,7 +82,6 @@ class ShoppingList:
         if (len(tj_results) != 0):
             t = tj_results[0]
             temp.append(t)
-        print(temp)
         temp = sorted(temp, key=lambda x: x["price"])
 
         return Item(temp[0], item)
