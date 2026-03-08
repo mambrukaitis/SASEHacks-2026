@@ -95,12 +95,11 @@ def publix_search_json(product, brand=""):
         for i in range(len(name_words) - len(product_phrase) + 1):
 
             if name_words[i:i + len(product_phrase)] == product_phrase:
-
                 category = extract_category(name)
 
                 result = {
                     "name": name,
-                    "price": item.get("priceString"),
+                    "price": price_to_float(item.get("priceString")),
                     "store": "Publix",
                     "brand": item.get("brandName"),
                     "category": category
@@ -171,22 +170,15 @@ def publix_search_limited(product, brand=""):
         ]
         # fallback if filtering removed everything
         if len(filtered) > 5:
-            return sorted(filtered[:5], key=lambda x: price_to_float(x.get("price")))
+            return sorted(filtered[:5], key=lambda x: (x.get("price")))
         else:
             if filtered:
-                return sorted(filtered, key=lambda x: price_to_float(x.get("price")))
-            return sorted(results[:5], key=lambda x: price_to_float(x.get("price"))) if len(results) > 5 else sorted(results, key=lambda x: price_to_float(x.get("price")))
+                return sorted(filtered, key=lambda x: (x.get("price")))
+            return sorted(results[:5], key=lambda x: (x.get("price"))) if len(results) > 5 else sorted(results, key=lambda x: price_to_float(x.get("price")))
 
     # otherwise return 10 cheapest
-    results_sorted = sorted(results, key=lambda x: price_to_float(x.get("price")))
+    results_sorted = sorted(results, key=lambda x: (x.get("price")))
     return results_sorted[:5]
 
 # if __name__ == "__main__":
-
-    # user_term = input("\nEnter a product name to search: ")
-    # user_brand = input("Enter a brand to prioritize (optional): ")
-    # user_results = publix_search_limited(user_term, user_brand)
-
-    # print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
-    # for r in user_results:
-    #     print(r)
+#     print(publix_search_limited("Milk")[0]["price"])
