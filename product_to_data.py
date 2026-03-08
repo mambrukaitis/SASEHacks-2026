@@ -17,11 +17,11 @@ except FileNotFoundError:
 def product_to_data(product):
     return publix_search_json(product)
 
-def aldi(search: str):
-    aldiScraper.aldiSearch(search)
+def aldi():
+    aldiScraper.aldiSearch()
 
-def tj(search: str):
-    tjScraper.tjSearch(search)
+def tj():
+    tjScraper.tjSearch()
 
 
 IGNORE_WORDS = {
@@ -180,8 +180,8 @@ def publix_search_limited(product, brand=""):
     # otherwise return 10 cheapest
     results_sorted = sorted(results, key=lambda x: price_to_float(x.get("price")))
     return results_sorted[:5]
-
 if __name__ == "__main__":
+    
 
     user_term = input("\nEnter a product name to search: ")
     user_brand = input("Enter a brand to prioritize (optional): ")
@@ -189,4 +189,5 @@ if __name__ == "__main__":
 
     print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
     for r in user_results:
+
         print(r)
