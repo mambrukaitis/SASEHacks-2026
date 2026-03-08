@@ -86,7 +86,7 @@ class ShoppingList:
             t = tj_results[0]
             temp.append(t)
         print(temp)
-        temp = sorted(temp, key=lambda x: x["price"])
+        #temp = sorted(temp, key=lambda x: x["price"])
 
         return Item(temp[0], item)
     
