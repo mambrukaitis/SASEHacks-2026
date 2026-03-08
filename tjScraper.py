@@ -1,6 +1,7 @@
 import requests
 
 def tjSearch(search: str):
+  
   url = "https://www.traderjoes.com/api/graphql"
 
   payload = {

@@ -179,6 +179,3 @@ def publix_search_limited(product, brand=""):
     # otherwise return 10 cheapest
     results_sorted = sorted(results, key=lambda x: (x.get("price")))
     return results_sorted[:5]
-
-# if __name__ == "__main__":
-#     print(type(tj("Milk")[0]["price"]))

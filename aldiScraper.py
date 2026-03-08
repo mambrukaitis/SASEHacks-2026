@@ -1,5 +1,6 @@
 import requests
 
+
 def aldiSearch(search: str):
     url = "https://api.aldi.us/v3/product-search?currency=USD&serviceType=pickup&q=" + search + "&limit=60&offset=0&sort=relevance&testVariant=A&servicePoint=474-109"
 
