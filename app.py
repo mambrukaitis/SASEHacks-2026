@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from recipeCards import ShoppingList, Expenses, Recipes
+from recipeCards import ShoppingList, Expenses, Recipes, Item
 
 app = Flask(__name__)
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 expenses = Expenses(100)
 shopping_list = ShoppingList(100, expenses)
 recipes = Recipes()
-tempItem = {}
+tempItem = Item()
 
 
 
@@ -34,7 +34,7 @@ def get_shopping_list():
 def add_item():
     data = request.json
 
-    shopping_list.addItem(temp["name"])
+    shopping_list.addItemItem(tempItem)
 
     return get_shopping_list()
 
@@ -43,10 +43,10 @@ def add_item():
 def search_item():
     data = request.json
     #data is string in text box
-    tempItem = shopping_list.searchItem(data)
+    global tempItem
+    tempItem = shopping_list.searchItem(data["name"])
 
-    return get_shopping_list()
-
+    return jsonify(tempItem.to_dict())
 
 
 
