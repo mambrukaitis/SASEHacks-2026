@@ -123,7 +123,7 @@ class ShoppingList:
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
         aldi_results = product_to_data.aldi(item)
-        tj_results = product_to_data.tjs(item)
+        tj_results = product_to_data.tj(item)
 
         if not publix_results or not aldi_results or not tj_results:
             return
