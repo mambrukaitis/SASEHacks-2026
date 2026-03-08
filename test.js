@@ -1,4 +1,4 @@
-const API_BASE = "http://10.136.151.191:5000";
+const API_BASE = "http://10.136.194.45:5001";
 
 
 export async function getShoppingList() {
@@ -8,7 +8,7 @@ export async function getShoppingList() {
 
 export async function getBudget() {
   try {
-    const response = await fetch("http://10.136.151.191:5000/budget");
+    const response = await fetch("http://10.136.194.45:5001/budget");
 
     if (!response.ok) {
       throw new Error("Failed to fetch budget");
@@ -22,6 +22,21 @@ export async function getBudget() {
     return null;
   }
 }
+
+export async function searchItem(name) {
+  const res = await fetch(`${API_BASE}/search_item`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: name
+    })
+  });
+
+  return await res.json();
+}
+
 
 export async function addItem(name) {
   const res = await fetch(`${API_BASE}/add_item`, {
