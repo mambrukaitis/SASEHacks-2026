@@ -34,6 +34,7 @@ class Expenses:
         self.remainingBudget -= item.price
 
     def removeItem(self, item: Item):
+        #remove needs to be an Item all functions need fix TODO: 
         self.items.remove(item)
         self.remainingBudget += item.price
     
