@@ -77,12 +77,20 @@ class ShoppingList:
 
         
         if p["price"] <= t["price"] and p["price"] <= a["price"]:
-            return Item(p, item).to_dict()
+            return Item(p, item)
         elif t["price"] <= p["price"] and t["price"] <= a["price"]:
-            return Item(t, item).to_dict()
+            return Item(t, item)
         else:
-            return Item(a, item).to_dict()
+            return Item(a, item)
 
+    def addItemItem(self, item):
+        if (item.store == "Publix"):
+            self.publix.append(item)
+        elif (item.store == "Trader Joe's"):
+            self.tjs.append(item)
+        else:
+            self.aldis.append(item)
+        
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
         aldi_results = product_to_data.aldi(item)
