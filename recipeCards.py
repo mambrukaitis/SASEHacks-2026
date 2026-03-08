@@ -140,15 +140,12 @@ class ShoppingList:
         if p["price"] <= t["price"] and p["price"] <= a["price"]:
             self.publix.append(Item(p, item))
             self.remainingBudget -= p["price"]
-            print(p + "1" + "p")
         elif t["price"] <= p["price"] and t["price"] <= a["price"]:
             self.tjs.append(Item(t, item))
             self.remainingBudget -= t["price"]
-            print(t + "1" + "t")
         else:
             self.aldis.append(Item(a, item))
             self.remainingBudget -= a["price"]
-            print (a + "1" + "a")
 
         print("add item ran")
         self.items.append(item)
