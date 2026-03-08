@@ -2,29 +2,38 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
+import { addRecipeIngredients } from '@/services/api';
 
 interface RecipeCardProps {
   title: string;
   ingredients: string[];
-  onPress?: () => void;
-  onInfoPress?: () => void;
+  onInfoPress?: () => void; // only info button triggers edit
 }
 
 export function RecipeCard({
   title,
   ingredients,
-  onPress,
   onInfoPress,
 }: RecipeCardProps) {
+  // Clicking the main card adds ingredients
+  const handleCardPress = () => {
+    addRecipeIngredients(ingredients).catch((err) => {
+      console.error('Failed to add recipe ingredients', err);
+    });
+  };
+
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable style={styles.card} onPress={handleCardPress}>
       <View style={styles.content}>
+        {/* Title */}
         <View style={styles.titleRow}>
           <View style={styles.underline} />
           <Text style={styles.title} numberOfLines={1}>
             {title}
           </Text>
         </View>
+
+        {/* Ingredients list */}
         <View style={styles.ingredients}>
           {ingredients.map((ingredient, i) => (
             <View key={i} style={styles.ingredientRow}>
@@ -36,8 +45,18 @@ export function RecipeCard({
           ))}
         </View>
       </View>
-      <Pressable style={styles.infoButton} onPress={onInfoPress} hitSlop={8}>
-        <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
+
+      {/* Info button (edit modal) */}
+      <Pressable
+        style={styles.infoButton}
+        onPress={onInfoPress}
+        hitSlop={8}
+      >
+        <MaterialIcons
+          name="info-outline"
+          size={22}
+          color={Colors.darkGreen}
+        />
       </Pressable>
     </Pressable>
   );
