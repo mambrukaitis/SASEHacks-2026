@@ -67,28 +67,34 @@ class ShoppingList:
         publix_results = product_to_data.publix_search_limited(item)
         aldi_results = product_to_data.aldi(item)
         tj_results = product_to_data.tj(item)
-
+        p, a, t = None
         print(item)
         print(len(publix_results))
         print(len(tj_results))
         if not publix_results or not aldi_results or not tj_results:
             return Item({}, "")
 
-        p = publix_results[0]
-        a = aldi_results[0]
-        t = tj_results[0]
+        if(not len(publix_results)):
+            p = publix_results[0]
+        if (not len(aldi_results)):
+            a = aldi_results[0]
+        if(not len(tj_results)):
+            t = tj_results[0]
 
         
-        if p["price"] <= t["price"] and p["price"] <= a["price"]:
+        if p and p["price"] <= t["price"] and p["price"] <= a["price"]:
             return Item(p, item)
-        elif t["price"] <= p["price"] and t["price"] <= a["price"]:
+        elif t and t["price"] <= p["price"] and t["price"] <= a["price"]:
             return Item(t, item)
         else:
-            return Item(a, item)
+            if not a:
+                return Item(a, item)
         return Item({}, "")
 
 
     def addItemItem(self, item):
+        if item is None:
+            print("item is none fix now")
         if (item.store == "Publix"):
             self.publix.append(item)
         elif (item.store == "Trader Joe's"):
