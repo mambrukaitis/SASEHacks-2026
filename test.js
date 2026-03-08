@@ -111,7 +111,7 @@ export async function removeItem(name, store) {
 
   return await res.json();
 }
-export async function deleteItem(name: string) {
+export async function deleteItem(name) {
   return fetch('/api/delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
