@@ -36,7 +36,13 @@ export function RecipeCard({
           ))}
         </View>
       </View>
-      <Pressable style={styles.infoButton} onPress={onInfoPress} hitSlop={8}>
+      <Pressable
+        style={styles.infoButton}
+        onPress={(e) => {
+          e.stopPropagation();
+          onInfoPress?.();
+        }}
+        hitSlop={8}>
         <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
       </Pressable>
     </Pressable>

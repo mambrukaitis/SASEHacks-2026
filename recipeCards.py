@@ -85,6 +85,25 @@ class ShoppingList:
         temp = sorted(temp, key=lambda x: x["price"])
 
         return Item(temp[0], item)
+    
+    def searchList(self, item: str):
+        publix_results = product_to_data.publix_search_limited(item) or []
+        aldi_results = product_to_data.aldi(item) or []
+        tj_results = product_to_data.tj(item) or []
+    
+        if  len(publix_results) == 0 and len(aldi_results) == 0 and  len(tj_results) == 0:
+            return [] # return an empty list instead of None
+        
+        all_results = publix_results + aldi_results + tj_results       
+        all_results = sorted(all_results, key=lambda x: x["price"])
+        all_results = all_results[:7]
+
+
+        temp = []
+        for s in all_results:
+            temp.append(Item(s, item))
+            
+        return all_results
 
 
     def addItemItem(self, item: Item):

@@ -12,16 +12,19 @@ import {
   addRecipe,
   editRecipe,
   deleteRecipe,
+  addRecipeToShopping,
 } from '@/services/api';
 import {
   SAMPLE_RECIPES,
   type SampleRecipe,
 } from '@/data/sample-recipes';
+import { useShoppingList } from '@/contexts/shopping-list-context';
 
 export default function HomeScreen() {
   const [recipes, setRecipes] = React.useState<SampleRecipe[]>(SAMPLE_RECIPES);
   const [modalRecipe, setModalRecipe] = React.useState<SampleRecipe | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const { refreshFromBackend } = useShoppingList();
 
   React.useEffect(() => {
     getRecipes().then((data) => {
@@ -45,6 +48,11 @@ export default function HomeScreen() {
   const openEdit = (recipe: SampleRecipe) => {
     setModalRecipe(recipe);
     setModalVisible(true);
+  };
+
+  const handleAddRecipeToList = async (recipe: SampleRecipe) => {
+    await addRecipeToShopping(recipe.name);
+    await refreshFromBackend();
   };
 
   const handleDone = async (data: { name: string; ingredients: string[] }) => {
@@ -107,7 +115,7 @@ export default function HomeScreen() {
               key={recipe.id}
               title={recipe.name}
               ingredients={recipe.ingredients}
-              onPress={() => openEdit(recipe)}
+              onPress={() => handleAddRecipeToList(recipe)}
               onInfoPress={() => openEdit(recipe)}
             />
           ))}
