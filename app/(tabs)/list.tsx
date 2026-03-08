@@ -358,10 +358,17 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     backgroundColor: Colors.delete,
     shadowColor: '#000',
+<<<<<<< HEAD
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.14,
     shadowRadius: 6,
     elevation: 2,
+=======
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10.2,
+    elevation: 4,
+>>>>>>> 95d97d84b1d76830b744ee1c92811ba11858b96c
   },
   clearButtonText: {
     fontFamily: 'Inter-Regular',

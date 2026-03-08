@@ -12,6 +12,7 @@ class Item:
         self.brand = itemDict.get("brand")
         self.category = i
         self.selected = False
+        self.selected = False
     
     def to_dict(self):
         return {
@@ -74,10 +75,23 @@ class ShoppingList:
 
         temp = []
         if (len(publix_results) != 0):
+            publix_results = product_to_data.publix_search_limited(item) or []
+            aldi_results = product_to_data.aldi(item) or []
+            tj_results = product_to_data.tj(item) or []
+    
+        if  len(publix_results) == 0 and len(aldi_results) == 0 and  len(tj_results) == 0:
+            return Item({}, "")  # return an empty Item instead of None
+
+        temp = []
+        if (len(publix_results) != 0):
             p = publix_results[0]
             temp.append(p)
         if (len(aldi_results) != 0):
+            temp.append(p)
+        if (len(aldi_results) != 0):
             a = aldi_results[0]
+            temp.append(a)
+        if (len(tj_results) != 0):
             temp.append(a)
         if (len(tj_results) != 0):
             t = tj_results[0]

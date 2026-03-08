@@ -44,12 +44,24 @@ def search_item():
 @app.route("/add_item", methods=["POST"])
 def add_item():
     global tempItem
+<<<<<<< HEAD
     if tempItem is not None:
         # Check if item already exists in shopping list to avoid duplicates
         if tempItem.name not in shopping_list.items:
             shopping_list.addItemItem(tempItem)
             
         tempItem = None 
+=======
+    #data = request.json or {}
+    #name = data.get("name")
+    shopping_list.addItemItem(tempItem)
+
+    #if name:
+        #tempItem = None
+    #elif tempItem is not None:
+    #    shopping_list.addItemItem(tempItem)
+        #tempItem = None
+>>>>>>> 95d97d84b1d76830b744ee1c92811ba11858b96c
     return get_shopping_list()
 
 @app.route("/remove_item", methods=["POST"])
@@ -105,6 +117,7 @@ def clear_shopping_list():
     shopping_list.removeAll()
     return get_shopping_list() 
 
+<<<<<<< HEAD
 
 @app.route("/search", methods=["GET"])
 def search():
@@ -116,6 +129,8 @@ def search():
     results = shopping_list.searchList(query)
     return jsonify([item.to_dict() for item in results])
 
+=======
+>>>>>>> 95d97d84b1d76830b744ee1c92811ba11858b96c
 
 # ---------------------------------------------------
 # RECIPE ROUTES
