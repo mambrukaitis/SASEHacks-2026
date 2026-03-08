@@ -18,10 +18,10 @@ def product_to_data(product):
     return publix_search_json(product)
 
 def aldi(search: str):
-    aldiScraper.aldiSearch(search)
+    return aldiScraper.aldiSearch(search)
 
 def tj(search: str):
-    tjScraper.tjSearch(search)
+    return tjScraper.tjSearch(search)
 
 
 IGNORE_WORDS = {
@@ -89,7 +89,7 @@ def publix_search_json(product, brand=""):
         name_words = normalized_name.split()
 
         if (not item.get("brandName", "")):
-            continue;
+            continue
         brand_name = item.get("brandName", "").lower()
 
         for i in range(len(name_words) - len(product_phrase) + 1):
@@ -183,10 +183,10 @@ def publix_search_limited(product, brand=""):
 
 if __name__ == "__main__":
 
-    user_term = input("\nEnter a product name to search: ")
-    user_brand = input("Enter a brand to prioritize (optional): ")
-    user_results = publix_search_limited(user_term, user_brand)
+    # user_term = input("\nEnter a product name to search: ")
+    # user_brand = input("Enter a brand to prioritize (optional): ")
+    # user_results = publix_search_limited(user_term, user_brand)
 
-    print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
-    for r in user_results:
-        print(r)
+    # print(f"\nResults for '{user_term}' (brand: '{user_brand}'):\n")
+    # for r in user_results:
+    #     print(r)
