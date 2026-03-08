@@ -42,13 +42,14 @@ def search_item():
 def add_item():
     global tempItem
     data = request.json or {}
-    name = data.get("name")
-    if name:
-        shopping_list.addItem(name)
-        tempItem = None
-    elif tempItem is not None:
-        shopping_list.addItemItem(tempItem)
-        tempItem = None
+    #name = data.get("name")
+    shopping_list.addItemItem(tempItem)
+
+    #if name:
+        #tempItem = None
+    #elif tempItem is not None:
+    #    shopping_list.addItemItem(tempItem)
+        #tempItem = None
     return get_shopping_list()
 
 
