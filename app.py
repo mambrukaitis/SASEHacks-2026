@@ -102,6 +102,11 @@ def get_budget():
         "remainingBudget": expenses.remainingBudget
     })
 
+@app.route("/clear_shopping_list", methods=["POST"])
+def clear_shopping_list():
+    shopping_list.removeAll()
+    return get_shopping_list() 
+
 
 # ---------------------------------------------------
 # RECIPE ROUTES
