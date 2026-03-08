@@ -87,11 +87,7 @@ class ShoppingList:
             p = publix_results[0]
             temp.append(p)
         if (len(aldi_results) != 0):
-            temp.append(p)
-        if (len(aldi_results) != 0):
             a = aldi_results[0]
-            temp.append(a)
-        if (len(tj_results) != 0):
             temp.append(a)
         if (len(tj_results) != 0):
             t = tj_results[0]
