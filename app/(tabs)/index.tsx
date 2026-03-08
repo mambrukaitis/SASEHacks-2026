@@ -12,7 +12,7 @@ import {
   addRecipe,
   editRecipe,
   deleteRecipe,
-  addRecipeToShopping,
+  addRecipeIngredientsToShopping,
 } from '@/services/api';
 import {
   SAMPLE_RECIPES,
@@ -51,7 +51,7 @@ export default function HomeScreen() {
   };
 
   const handleAddRecipeToList = async (recipe: SampleRecipe) => {
-    await addRecipeToShopping(recipe.name);
+    await addRecipeIngredientsToShopping(recipe.ingredients);
     await refreshFromBackend();
   };
 
