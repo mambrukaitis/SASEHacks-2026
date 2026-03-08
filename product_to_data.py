@@ -182,4 +182,4 @@ def publix_search_limited(product, brand=""):
     return results_sorted[:5]
 
 # if __name__ == "__main__":
-#     print(publix_search_limited("Milk")[0]["price"])
+#     print(type(tj("Milk")[0]["price"]))
