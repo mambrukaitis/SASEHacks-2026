@@ -34,7 +34,7 @@ def get_shopping_list():
 def add_item():
     data = request.json
 
-    shopping_list.addItem(tempItem["name"])
+    shopping_list.addItemItem(tempItem)
 
     return get_shopping_list()
 
@@ -171,4 +171,4 @@ def add_recipe_to_shopping():
 # ---------------------------------------------------
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
