@@ -2,29 +2,42 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
+import { addRecipeIngredients } from '@/services/api'; // your JS API function
 
 interface RecipeCardProps {
   title: string;
   ingredients: string[];
-  onPress?: () => void;
-  onInfoPress?: () => void;
+  onInfoPress?: () => void; // only triggers edit
 }
 
 export function RecipeCard({
   title,
   ingredients,
-  onPress,
   onInfoPress,
 }: RecipeCardProps) {
+
+  // Function to call API when card is pressed
+  const handleCardPress = async () => {
+    try {
+      await addRecipeIngredients(ingredients);
+      console.log('Ingredients added successfully');
+    } catch (err) {
+      console.error('Failed to add recipe ingredients', err);
+    }
+  };
+
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable style={styles.card} onPress={handleCardPress}>
       <View style={styles.content}>
+        {/* Recipe title */}
         <View style={styles.titleRow}>
           <View style={styles.underline} />
           <Text style={styles.title} numberOfLines={1}>
             {title}
           </Text>
         </View>
+
+        {/* Ingredient list */}
         <View style={styles.ingredients}>
           {ingredients.map((ingredient, i) => (
             <View key={i} style={styles.ingredientRow}>
@@ -36,14 +49,21 @@ export function RecipeCard({
           ))}
         </View>
       </View>
+
+      {/* Info button for editing */}
       <Pressable
         style={styles.infoButton}
         onPress={(e) => {
-          e.stopPropagation();
-          onInfoPress?.();
+          e.stopPropagation(); // prevent triggering card press
+          if (onInfoPress) onInfoPress();
         }}
-        hitSlop={8}>
-        <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
+        hitSlop={8}
+      >
+        <MaterialIcons
+          name="info-outline"
+          size={22}
+          color={Colors.darkGreen}
+        />
       </Pressable>
     </Pressable>
   );
