@@ -23,34 +23,34 @@ export async function getBudget() {
   }
 }
 
-export async function searchItem(name) {
-  const res = await fetch(`${API_BASE}/search_item`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name: name
-    })
-  });
+// export async function searchItem(name) {
+//   const res = await fetch(`${API_BASE}/search_item`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json"
+//     },
+//     body: JSON.stringify({
+//       name: name
+//     })
+//   });
 
-  return await res.json();
-}
+//   return await res.json();
+// }
 
 
-export async function addItem(name) {
-  const res = await fetch(`${API_BASE}/add_item`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name: name
-    })
-  });
+// export async function addItem(name) {
+//   const res = await fetch(`${API_BASE}/add_item`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json"
+//     },
+//     body: JSON.stringify({
+//       name: name
+//     })
+//   });
 
-  return await res.json();
-}
+//   return await res.json();
+// }
 
 
 export async function removeItem(name, store) {
