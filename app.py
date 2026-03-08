@@ -157,17 +157,17 @@ def edit_recipe():
 
 @app.route("/add_recipe_to_shopping", methods=["POST"])
 def add_recipe_to_shopping():
+    data = request.json or {}
+    recipe_name = data.get("name")
 
-    data = request.json
+    if not recipe_name:
+        return jsonify({"error": "No recipe name provided"}), 400
 
     for card in recipes.recipeCards:
-        if card.name == data["name"]:
-
+        if card.name == recipe_name:
             card.addToShopping(shopping_list)
+            return get_shopping_list()  # return updated list
 
-            break
-
-    return get_shopping_list()
 
 
 # ---------------------------------------------------
