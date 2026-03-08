@@ -6,6 +6,22 @@ export async function getShoppingList() {
   return await res.json();
 }
 
+export async function getBudget() {
+  try {
+    const response = await fetch("http://10.136.151.191:5000/budget");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch budget");
+    }
+
+    const data = await response.json();
+
+    return data.budget; // returns the number
+  } catch (error) {
+    console.error("Error getting budget:", error);
+    return null;
+  }
+}
 
 export async function addItem(name) {
   const res = await fetch(`${API_BASE}/add_item`, {
