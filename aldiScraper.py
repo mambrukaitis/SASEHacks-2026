@@ -18,6 +18,7 @@ def aldiSearch(search: str):
     products = data["data"]
     products = [p for p in products if search in p["name"].lower()]
     products = [p for p in products if not (search.lower() in ["pizza", "pasta"] and "sauce" in p["name"].lower())]
+    products = [p for p in products if not (search.lower() in ["milk"] and "evaporated" in p["name"].lower())]
 
     sortedProducts = sorted(
         products, 
