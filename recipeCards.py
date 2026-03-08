@@ -24,31 +24,18 @@ class Item:
         }
     
 class Expenses:
-    def __init__(self, budget: float = 0, shopList=None):
+    def __init__(self, budget: float =0, shopList=None):
         self.budget = budget
         self.remainingBudget = budget
-        self.items = []
-        self.shopping_list = shopList
-
-    def _parse_price(self, p):
-        if p is None:
-            return 0.0
-        if isinstance(p, (int, float)):
-            return float(p)
-        if isinstance(p, str):
-            try:
-                return float(str(p).replace("$", "").strip())
-            except ValueError:
-                return 0.0
-        return 0.0
+        self.items = [] # a list of selected Items
 
     def addItem(self, item: Item):
         self.items.append(item)
-        self.remainingBudget -= self._parse_price(item.price)
+        self.remainingBudget -= item.price
 
     def removeItem(self, item: Item):
         self.items.remove(item)
-        self.remainingBudget += self._parse_price(item.price)
+        self.remainingBudget += item.price
     
     def changeBudget(self, newBudget: float):
         diff = self.budget - self.remainingBudget
@@ -78,45 +65,60 @@ class ShoppingList:
 
     def searchItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
-        if not publix_results:
-            return None
+        aldi_results = product_to_data.aldi(item)
+        tj_results = product_to_data.tj(item)
+
+        print(item)
+        print(len(publix_results))
+        print(len(tj_results))
+        if not publix_results or not aldi_results or not tj_results:
+            return Item({}, "")
+
         p = publix_results[0]
-        price_val = p.get("price") or p.get("priceString", "")
-        if isinstance(price_val, str):
-            try:
-                price_val = float(str(price_val).replace("$", ""))
-            except ValueError:
-                price_val = 0.0
-        p_copy = {"name": p.get("name"), "price": price_val, "store": "Publix", "brand": p.get("brand")}
-        return Item(p_copy, item)
+        a = aldi_results[0]
+        t = tj_results[0]
+
+        
+        if p["price"] <= t["price"] and p["price"] <= a["price"]:
+            return Item(p, item)
+        elif t["price"] <= p["price"] and t["price"] <= a["price"]:
+            return Item(t, item)
+        else:
+            return Item(a, item)
+        return Item({}, "")
+
 
     def addItemItem(self, item):
-        if item is None:
-            return
-        store = (item.store or "").lower()
-        if "publix" in store:
+        if (item.store == "Publix"):
             self.publix.append(item)
-        elif "trader" in store or "joe" in store:
+        elif (item.store == "Trader Joe's"):
             self.tjs.append(item)
         else:
             self.aldis.append(item)
-        if item.price:
-            self.remainingBudget -= item.price if isinstance(item.price, (int, float)) else 0
-        self.items.append(item.category or item.name)
-
+        
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
-        if not publix_results:
+        aldi_results = product_to_data.aldi(item)
+        tj_results = product_to_data.tjs(item)
+
+        if not publix_results or not aldi_results or not tj_results:
             return
+
         p = publix_results[0]
-        price_val = p.get("price") or p.get("priceString", "")
-        if isinstance(price_val, str):
-            try:
-                price_val = float(str(price_val).replace("$", ""))
-            except ValueError:
-                price_val = 0.0
-        self.publix.append(Item({**p, "price": price_val}, item))
-        self.remainingBudget -= price_val
+        a = aldi_results[0]
+        t = tj_results[0]
+
+        
+        if p["price"] <= t["price"] and p["price"] <= a["price"]:
+            self.publix.append(Item(p, item))
+            self.remainingBudget -= p["price"]
+        elif t["price"] <= p["price"] and t["price"] <= a["price"]:
+            self.tjs.append(Item(t, item))
+            self.remainingBudget -= t["price"]
+        else:
+            self.aldis.append(Item(a, item))
+            self.remainingBudget -= a["price"]
+
         self.items.append(item)
 
     def removeItemClass(self, item_name: str):
