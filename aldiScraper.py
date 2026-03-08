@@ -28,7 +28,7 @@ def aldiSearch(search: str):
 
     result = []
 
-    for p in sortedProducts[:5]:
+    for p in sortedProducts[:7]:
         result.append({
         "name": p["name"] ,
         "price": p["price"]["amount"] / 100,

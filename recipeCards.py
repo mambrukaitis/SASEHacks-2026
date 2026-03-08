@@ -96,15 +96,10 @@ class ShoppingList:
         
         all_results = publix_results + aldi_results + tj_results       
         all_results = sorted(all_results, key=lambda x: x["price"])
-        all_results = all_results[:7]
+        all_results = all_results[:10]
 
 
-        temp = []
-        for s in all_results:
-            temp.append(Item(s, item))
-
-        return all_results
-
+        return [Item(data, item) for data in all_results]
 
     def addItemItem(self, item: Item):
         if item is None:
@@ -155,10 +150,13 @@ class ShoppingList:
         self.remainingBudget  = self.budget - diff
 
     def removeAll(self):
-        for a in self.aldis: self.aldis.remove(a)
-        for p in self.publix: self.publix.remove(p)
-        for t in self.tjs: self.tjs.remove(t)
-        for i in self.items: self.items.remove(i)
+        self.aldis = []
+        self.publix = []
+        self.tjs = []
+        self.items = []
+
+        if self.expenses:
+            self.expenses.remainingBudget = self.expenses.budget
 
     def exportData(self):
         return {

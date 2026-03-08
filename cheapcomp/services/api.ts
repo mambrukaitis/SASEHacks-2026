@@ -39,6 +39,21 @@ export async function getShoppingList(): Promise<BackendShoppingList | null> {
   }
 }
 
+export async function searchList(query: string): Promise<BackendItem[]> {
+  const term = query.trim();
+  if (!term) return [];
+  try {
+    const res = await fetchWithTimeout(
+      `${API_BASE}/search?q=${encodeURIComponent(term)}`
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? (data as BackendItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export async function searchItem(name: string): Promise<Record<string, unknown> | null> {
   try {
     const res = await fetchWithTimeout(`${API_BASE}/search_item`, {

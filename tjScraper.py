@@ -72,7 +72,7 @@ def tjSearch(search: str):
 
   result = []
 
-  for p in sortedProducts[:5]:
+  for p in sortedProducts[:7]:
     result.append({
       "name": p["item_title"] + " " + str(p["sales_size"]) + " " + p["sales_uom_description"],
       "price": float(p["retail_price"]),
