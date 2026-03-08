@@ -96,6 +96,7 @@ export async function deleteRecipe(data) {
   }
 }
 
+
 export async function removeItem(name, store) {
   const res = await fetch(`${API_BASE}/remove_item`, {
     method: "POST",
@@ -109,6 +110,13 @@ export async function removeItem(name, store) {
   });
 
   return await res.json();
+}
+export async function deleteItem(name: string) {
+  return fetch('/api/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
 }
 
 
