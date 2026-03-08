@@ -19,7 +19,11 @@ def product_to_data(product):
     return publix_search_json(product)
 
 def aldi(search: str):
+<<<<<<< HEAD
    return aldiScraper.aldiSearch(search)
+=======
+    return aldiScraper.aldiSearch(search)
+>>>>>>> 899216a (fixing shit again)
 
 def tj(search: str):
     return tjScraper.tjSearch(search)
@@ -90,7 +94,7 @@ def publix_search_json(product, brand=""):
         name_words = normalized_name.split()
 
         if (not item.get("brandName", "")):
-            continue;
+            continue
         brand_name = item.get("brandName", "").lower()
 
         for i in range(len(name_words) - len(product_phrase) + 1):
