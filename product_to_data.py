@@ -17,11 +17,11 @@ except FileNotFoundError:
 def product_to_data(product):
     return publix_search_json(product)
 
-def aldi():
-    aldiScraper.aldiSearch()
+def aldi(search: str):
+    aldiScraper.aldiSearch(search)
 
-def tj():
-    tjScraper.tjSearch()
+def tj(search: str):
+    tjScraper.tjSearch(search)
 
 
 IGNORE_WORDS = {

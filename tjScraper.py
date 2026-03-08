@@ -1,7 +1,6 @@
 import requests
 
-def tjSearch():
-  search = input("What do you want to look up? ")
+def tjSearch(search: str):
   url = "https://www.traderjoes.com/api/graphql"
 
   payload = {

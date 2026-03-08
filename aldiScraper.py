@@ -1,8 +1,6 @@
 import requests
 
-def aldiSearch():
-
-    search = input("What do you want to look up? ")
+def aldiSearch(search: str):
     url = "https://api.aldi.us/v3/product-search?currency=USD&serviceType=pickup&q=" + search + "&limit=60&offset=0&sort=relevance&testVariant=A&servicePoint=474-109"
 
     headers = {
@@ -32,9 +30,8 @@ def aldiSearch():
         result.append({
         "name": p["name"] ,
         "price": p["price"]["amount"] / 100,
-        "store": "Aldi's",
+        "store": "Aldi",
         "brand": p["brandName"]
         })
 
     return result
-
