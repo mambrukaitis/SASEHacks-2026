@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import type { BackendShoppingList } from '@/services/api';
 import { getShoppingList, selectItem as apiSelectItem, deselectItem as apiDeselectItem } from '@/services/api';
-import { removeItem as apiDeleteItem } from '@/services/api';
+import { removeItem as apiRemoveItem } from '@/services/api';
 
 export type StoreName = 'Publix' | 'Aldis' | 'Trader Joes';
 
