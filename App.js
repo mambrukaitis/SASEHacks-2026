@@ -1,20 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// Run with: npm start — the cheapcomp app runs from here.
+// UI is in app/ (from cheapcomp) with @ pointing at cheapcomp/.
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Hello, Matas!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#522100ff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+import '@expo/metro-runtime';
+export { App as default } from 'expo-router/build/qualified-entry';
