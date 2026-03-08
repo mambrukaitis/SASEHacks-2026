@@ -66,6 +66,20 @@ export async function addItem(name: string): Promise<unknown> {
   }
 }
 
+export async function addRecipeIngredientsToShopping(ingredients: string[]): Promise<void> {
+  if (!ingredients || ingredients.length === 0) return;
+  for (const ingredient of ingredients) {
+    const name = (ingredient ?? '').trim();
+    if (!name) continue;
+    try {
+      await searchItem(name);
+      await addItem(name);
+    } catch {
+      // ignore individual ingredient errors so others can still be added
+    }
+  }
+}
+
 export async function selectItem(name: string): Promise<unknown> {
   try {
     const res = await fetchWithTimeout(`${API_BASE}/select_item`, {
@@ -149,6 +163,33 @@ export async function deleteRecipe(data: { name: string }): Promise<unknown> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function addRecipeToShopping(name: string): Promise<BackendShoppingList | null> {
+  try {
+    const res = await fetchWithTimeout(`${API_BASE}/add_recipe_to_shopping`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function clearShoppingList(): Promise<BackendShoppingList | null> {
+  try {
+    const res = await fetchWithTimeout(`${API_BASE}/clear_shopping_list`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return null;
     return res.json();
   } catch {
     return null;

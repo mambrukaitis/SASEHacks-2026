@@ -22,7 +22,7 @@ function storeFromFilter(f: FilterType): StoreName | 'all' {
 }
 
 export default function ListScreen() {
-  const { items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend } = useShoppingList();
+  const { items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend, clearList } = useShoppingList();
   const { budget } = useBudget();
   const [selectedFilter, setSelectedFilter] = React.useState<FilterType>('Overall');
   const [modalItem, setModalItem] = React.useState<ShoppingListItem | null | 'new'>(null);
@@ -68,6 +68,10 @@ export default function ListScreen() {
   const handleDelete = (id: string) => {
     removeItem(id);
     setModalItem(null);
+  };
+
+  const handleClearList = () => {
+    clearList();
   };
 
   const storeOrder: StoreName[] = ['Publix', 'Aldis', 'Trader Joes'];
@@ -141,10 +145,16 @@ export default function ListScreen() {
           <Text style={styles.projectedPillValue}>${projectedBalance.toFixed(2)}</Text>
         </View>
 
-        <TouchableOpacity style={styles.addButton} onPress={handleAddNew} activeOpacity={0.8}>
-          <MaterialIcons name="add" size={24} color={Colors.background} />
-          <Text style={styles.addButtonText}>Add New</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddNew} activeOpacity={0.8}>
+            <MaterialIcons name="add" size={24} color={Colors.background} />
+            <Text style={styles.addButtonText}>Add New</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.clearButton} onPress={handleClearList} activeOpacity={0.8}>
+            <MaterialIcons name="delete-sweep" size={24} color={Colors.background} />
+            <Text style={styles.clearButtonText}>Clear List</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       <ListItemModal
@@ -308,17 +318,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.background,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 16,
+  },
   addButton: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    alignSelf: 'center',
     backgroundColor: Colors.darkGreen,
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 28,
-    marginTop: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -326,6 +342,28 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   addButtonText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.background,
+  },
+  clearButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 28,
+    backgroundColor: Colors.delete,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10.2,
+    elevation: 4,
+  },
+  clearButtonText: {
     fontFamily: 'Inter-Regular',
     fontSize: 18,
     fontWeight: '600',

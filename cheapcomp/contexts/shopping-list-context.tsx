@@ -1,8 +1,13 @@
 import * as React from 'react';
 
 import type { BackendShoppingList } from '@/services/api';
-import { getShoppingList, selectItem as apiSelectItem, deselectItem as apiDeselectItem } from '@/services/api';
-import { removeItem as apiRemoveItem } from '@/services/api';
+import {
+  getShoppingList,
+  selectItem as apiSelectItem,
+  deselectItem as apiDeselectItem,
+  removeItem as apiRemoveItem,
+  clearShoppingList as apiClearShoppingList,
+} from '@/services/api';
 
 export type StoreName = 'Publix' | 'Aldis' | 'Trader Joes';
 
@@ -24,6 +29,7 @@ interface ShoppingListContextValue {
   expensesTotal: number;
   /** Refetch from backend. Returns true if data was fetched, false if API failed. */
   refreshFromBackend: () => Promise<boolean>;
+  clearList: () => Promise<void>;
 }
 
 const defaultItems: ShoppingListItem[] = [
@@ -147,9 +153,17 @@ export function ShoppingListProvider({ children }: { children: React.ReactNode }
     return false;
   }, []);
 
+  const clearList = React.useCallback(async () => {
+    try {
+      await apiClearShoppingList();
+    } finally {
+      setItems([]);
+    }
+  }, []);
+
   const value = React.useMemo(
-    () => ({ items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend }),
-    [items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend]
+    () => ({ items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend, clearList }),
+    [items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend, clearList]
   );
 
   return (
@@ -171,6 +185,7 @@ export function useShoppingList() {
       totalCost: 0,
       expensesTotal: 0,
       refreshFromBackend: async () => false,
+      clearList: async () => {},
     };
   }
   return ctx;
