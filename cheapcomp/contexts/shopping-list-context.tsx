@@ -20,8 +20,9 @@ interface ShoppingListContextValue {
   removeItem: (id: string) => void;
   addItem: (item: Omit<ShoppingListItem, 'id'>) => void;
   totalCost: number;
-  /** Sum of prices of checked (purchased) items — used for remaining budget and expenses tab */
   expensesTotal: number;
+  /** Refetch from backend. Returns true if data was fetched, false if API failed. */
+  refreshFromBackend: () => Promise<boolean>;
 }
 
 const defaultItems: ShoppingListItem[] = [
@@ -54,14 +55,23 @@ function mapBackendToItems(data: BackendShoppingList | null): ShoppingListItem[]
     { key: 'aldi', store: 'Aldis' },
     { key: 'trader_joes', store: 'Trader Joes' },
   ];
+  const parsePrice = (v: unknown): number => {
+    if (typeof v === 'number' && !isNaN(v)) return v;
+    if (typeof v === 'string') {
+      const n = parseFloat(v.replace(/[^0-9.]/g, ''));
+      return isNaN(n) ? 0 : n;
+    }
+    return 0;
+  };
+
   for (const { key, store } of stores) {
     const arr = data[key];
     if (!Array.isArray(arr)) continue;
-    arr.forEach((row: { name?: string; price?: number; selected?: boolean }, i: number) => {
+    arr.forEach((row: { name?: string; price?: unknown; selected?: boolean }, i: number) => {
       items.push({
         id: `${store}-${i}-${row.name ?? ''}`,
         name: row.name ?? '',
-        price: typeof row.price === 'number' ? row.price : 0,
+        price: parsePrice(row.price),
         store,
         checked: !!row.selected,
       });
@@ -117,9 +127,21 @@ export function ShoppingListProvider({ children }: { children: React.ReactNode }
     setItems((prev) => [...prev, { ...item, id: String(nextId++) }]);
   }, []);
 
+  const refreshFromBackend = React.useCallback(async () => {
+    const data = await getShoppingList();
+    if (data) {
+      const mapped = mapBackendToItems(data);
+      if (mapped.length > 0) {
+        setItems(mapped);
+        return true;
+      }
+    }
+    return false;
+  }, []);
+
   const value = React.useMemo(
-    () => ({ items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal }),
-    [items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal]
+    () => ({ items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend }),
+    [items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend]
   );
 
   return (
@@ -140,6 +162,7 @@ export function useShoppingList() {
       addItem: () => {},
       totalCost: 0,
       expensesTotal: 0,
+      refreshFromBackend: async () => false,
     };
   }
   return ctx;

@@ -19,7 +19,7 @@ interface RecipeCardModalProps {
   /** When null, creating new recipe; otherwise editing */
   recipe: SampleRecipe | null;
   onClose: () => void;
-  onDone: (recipe: { name: string; ingredients: string[]; price: number }) => void;
+  onDone: (recipe: { name: string; ingredients: string[] }) => void;
   onDelete?: (id: string) => void;
 }
 
@@ -31,26 +31,22 @@ export function RecipeCardModal({
   onDelete,
 }: RecipeCardModalProps) {
   const [name, setName] = React.useState('');
-  const [priceStr, setPriceStr] = React.useState('0.00');
   const [ingredients, setIngredients] = React.useState<string[]>([]);
   const [newIngredient, setNewIngredient] = React.useState('');
 
   React.useEffect(() => {
     if (recipe) {
       setName(recipe.name);
-      setPriceStr(recipe.price != null ? recipe.price.toFixed(2) : '0.00');
       setIngredients(recipe.ingredients ?? []);
     } else {
       setName('');
-      setPriceStr('0.00');
       setIngredients([]);
     }
     setNewIngredient('');
   }, [recipe, visible]);
 
   const handleDone = () => {
-    const price = parseFloat(priceStr) || 0;
-    onDone({ name: name.trim() || 'Untitled', ingredients: [...ingredients], price });
+    onDone({ name: name.trim() || 'Untitled', ingredients: [...ingredients] });
     onClose();
   };
 
@@ -113,21 +109,6 @@ export function RecipeCardModal({
               />
             </View>
           </ScrollView>
-
-          <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>Price:</Text>
-            <View style={styles.priceInputWrap}>
-              <Text style={styles.dollarPrefix}>$</Text>
-              <TextInput
-                style={styles.priceInput}
-                placeholder="0.00"
-                placeholderTextColor="rgba(249,243,240,0.8)"
-                value={priceStr}
-                onChangeText={(t) => setPriceStr(t.replace(/[^0-9.]/g, ''))}
-                keyboardType="decimal-pad"
-              />
-            </View>
-          </View>
 
           <View style={styles.buttons}>
             <Pressable style={styles.doneButton} onPress={handleDone}>
@@ -224,40 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '500',
     color: Colors.darkGreen,
-    paddingVertical: 4,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  priceLabel: {
-    fontFamily: 'Inter-Italic',
-    fontSize: 24,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: Colors.background,
-  },
-  priceInputWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dollarPrefix: {
-    fontFamily: 'Inter-Italic',
-    fontSize: 24,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: Colors.background,
-    marginRight: 4,
-  },
-  priceInput: {
-    minWidth: 80,
-    fontFamily: 'Inter-Italic',
-    fontSize: 24,
-    fontWeight: '700',
-    fontStyle: 'italic',
-    color: Colors.background,
     paddingVertical: 4,
   },
   buttons: {
