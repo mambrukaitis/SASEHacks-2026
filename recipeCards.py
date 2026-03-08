@@ -86,7 +86,7 @@ class ShoppingList:
             t = tj_results[0]
             temp.append(t)
         print(temp)
-        #temp = sorted(temp, key=lambda x: x["price"])
+        temp = sorted(temp, key=lambda x: x["price"])
 
         return Item(temp[0], item)
     
@@ -124,16 +124,12 @@ class ShoppingList:
         if item is None:
             print("item is none fix now")
         if (item.store == "Publix"):
-            print (item.name + "p")
             self.publix.append(item)
         elif (item.store == "Trader Joe's"):
-            print (item.name + "a")
             self.tjs.append(item)
         else:
-            print(item.name  + "a")
             self.aldis.append(item)
-        
-        print("additemitem ran")
+    
         
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
