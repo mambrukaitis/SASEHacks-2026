@@ -34,7 +34,7 @@ def get_shopping_list():
 def add_item():
     data = request.json
 
-    shopping_list.addItemItem(tempItem)
+    shopping_list.addItem(tempItem["name"])
 
     return get_shopping_list()
 
