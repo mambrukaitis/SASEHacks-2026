@@ -15,13 +15,13 @@ except FileNotFoundError:
     raise
 
 def product_to_data(product):
-    return publix_search_json(product)
+    return publix_search_json(product.lower())
 
 def aldi(search: str):
-    return aldiScraper.aldiSearch(search)
+    return aldiScraper.aldiSearch(search.lower())
 
 def tj(search: str):
-    return tjScraper.tjSearch(search)
+    return tjScraper.tjSearch(search.lower())
 
 
 IGNORE_WORDS = {
