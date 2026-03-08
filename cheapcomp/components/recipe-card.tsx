@@ -17,20 +17,15 @@ export function RecipeCard({
   onPress,
   onInfoPress,
 }: RecipeCardProps) {
-  // Handler that calls the API and also triggers any existing onPress
   const handlePress = () => {
-    // Call your API with the ingredients array
     addRecipeIngredients(ingredients).catch(() => {});
-
-    // Keep the original onPress behavior if it exists
-    if (onPress) {
-      onPress();
-    }
+    if (onPress) onPress();
   };
 
   return (
-    <Pressable style={styles.card} onPress={handlePress}>
-      <View style={styles.content}>
+    <View style={styles.card}>
+      {/* Make the content pressable for adding ingredients */}
+      <Pressable style={styles.content} onPress={handlePress}>
         <View style={styles.titleRow}>
           <View style={styles.underline} />
           <Text style={styles.title} numberOfLines={1}>
@@ -47,20 +42,17 @@ export function RecipeCard({
             </View>
           ))}
         </View>
-      </View>
-      {/* Info button stays separate, clicking it won't trigger handlePress */}
+      </Pressable>
+
+      {/* Info button stays separate */}
       <Pressable
         style={styles.infoButton}
         onPress={onInfoPress}
         hitSlop={8}
       >
-        <MaterialIcons
-          name="info-outline"
-          size={22}
-          color={Colors.darkGreen}
-        />
+        <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
       </Pressable>
-    </Pressable>
+    </View>
   );
 }
 
