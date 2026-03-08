@@ -10,6 +10,34 @@ export async function getShoppingList() {
   }
 }
 
+export async function addRecipeIngredients(ingredients) {
+  if (!ingredients || !ingredients.length) return;
+
+  for (const ingredient of ingredients) {
+    try {
+      // Call the search endpoint (optional, if you need to check first)
+      await fetch(`${API_BASE}/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: ingredient }),
+      });
+
+      // Call the insert endpoint
+      await fetch(`${API_BASE}/insert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: ingredient }),
+      });
+    } catch (err) {
+      console.error(`Failed to process ingredient "${ingredient}":`, err);
+    }
+  }
+}
+
 export async function getBudget() {
   try {
     const response = await fetch(`${API_BASE}/budget`);
