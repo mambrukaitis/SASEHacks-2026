@@ -110,20 +110,20 @@ class ShoppingList:
         # return Item({}, "")
 
 
-    def addItemItem(self, item):
+    def addItemItem(self, item: Item):
         if item is None:
             print("item is none fix now")
         if (item.store == "Publix"):
-            print (item + "2" + "p")
+            print (item.name + "p")
             self.publix.append(item)
         elif (item.store == "Trader Joe's"):
-            print (item + "2" + "a")
+            print (item.name + "a")
             self.tjs.append(item)
         else:
-            print(item + "2" + "a")
+            print(item.name  + "a")
             self.aldis.append(item)
         
-        print("additeitem ran")
+        print("additemitem ran")
         
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
