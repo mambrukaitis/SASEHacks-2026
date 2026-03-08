@@ -64,11 +64,15 @@ class ShoppingList:
         self.remainingBudget = budget
 
     def searchItem(self, item: str):
-        publix_results = product_to_data.publix_search_limited(item)
-        aldi_results = product_to_data.aldi(item)
-        tj_results = product_to_data.tj(item)
+        publix_results = product_to_data.publix_search_limited(item) or []
+        aldi_results = product_to_data.aldi(item) or []
+        tj_results = product_to_data.tj(item) or []
+
+        print(len(publix_results))
+        print(len(tj_results))
+        print(len(aldi_results))
     
-        if not publix_results or not aldi_results or not tj_results:
+        if  len(publix_results) == 0 and len(aldi_results) == 0 and  len(tj_results) == 0:
             return Item({}, "")  # return an empty Item instead of None
     
         p = publix_results[0]
@@ -82,6 +86,7 @@ class ShoppingList:
         )[0]
     
         return Item(cheapest, item)
+    
         # publix_results = product_to_data.publix_search_limited(item)
         # aldi_results = product_to_data.aldi(item)
         # tj_results = product_to_data.tj(item)
@@ -147,7 +152,6 @@ class ShoppingList:
             self.aldis.append(Item(a, item))
             self.remainingBudget -= a["price"]
 
-        print("add item ran")
         self.items.append(item)
 
     def removeItemClass(self, item_name: str):
