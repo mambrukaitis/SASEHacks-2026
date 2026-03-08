@@ -32,27 +32,25 @@ def search_item():
     global tempItem
     data = request.json or {}
     name = data.get("name", "")
-    tempItem = shopping_list.searchItem(name) if name else None
-    if tempItem is None:
+    if not name:
+        tempItem = None
         return jsonify({})
+    
+    # searchItem returns a single cheapest Item
+    tempItem = shopping_list.searchItem(name)
     return jsonify(tempItem.to_dict())
 
 
 @app.route("/add_item", methods=["POST"])
 def add_item():
     global tempItem
-    #data = request.json or {}
-    #name = data.get("name")
-    shopping_list.addItemItem(tempItem)
-
-    #if name:
-        #tempItem = None
-    #elif tempItem is not None:
-    #    shopping_list.addItemItem(tempItem)
-        #tempItem = None
+    if tempItem is not None:
+        # Check if item already exists in shopping list to avoid duplicates
+        if tempItem.name not in shopping_list.items:
+            shopping_list.addItemItem(tempItem)
+            
+        tempItem = None 
     return get_shopping_list()
-
-
 
 @app.route("/remove_item", methods=["POST"])
 def remove_item():
@@ -106,6 +104,17 @@ def get_budget():
 def clear_shopping_list():
     shopping_list.removeAll()
     return get_shopping_list() 
+
+
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args.get("q", "")
+    if not query:
+        return jsonify([])
+
+    # This does NOT touch tempItem
+    results = shopping_list.searchList(query)
+    return jsonify([item.to_dict() for item in results])
 
 
 # ---------------------------------------------------

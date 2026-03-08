@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,7 +13,7 @@ import {
 
 import { Colors } from '@/constants/Colors';
 import type { ShoppingListItem } from '@/contexts/shopping-list-context';
-import { searchItem, addItem } from '@/services/api';
+import { searchItem, addItem, searchList, type BackendItem } from '@/services/api';
 
 interface ListItemModalProps {
   visible: boolean;
@@ -36,6 +37,7 @@ export function ListItemModal({
   const [name, setName] = React.useState('');
   const [priceStr, setPriceStr] = React.useState('');
   const [searching, setSearching] = React.useState(false);
+  const [results, setResults] = React.useState<BackendItem[]>([]);
 
   React.useEffect(() => {
     if (item) {
@@ -45,24 +47,61 @@ export function ListItemModal({
       setName('');
       setPriceStr('');
     }
+    setResults([]);
   }, [item, isNewItem]);
 
-  const handleSearch = async () => {
-    const term = name.trim();
-    if (!term) return;
-    setSearching(true);
-    try {
-      const result = await searchItem(term);
-      if (result && typeof result === 'object' && 'name' in result) {
-        const r = result as { name?: string; price?: number | string };
-        setName(r.name ?? term);
-        const p = r.price;
-        if (typeof p === 'number') setPriceStr(p.toFixed(2));
-        else if (typeof p === 'string') setPriceStr(p.replace(/[^0-9.]/g, '') || '0');
-        else setPriceStr('0');
+  const performSearch = React.useCallback(
+    async (termRaw: string) => {
+      const term = termRaw.trim();
+      if (!term) {
+        setResults([]);
+        return;
       }
-    } finally {
-      setSearching(false);
+      setSearching(true);
+      try {
+        const listResults = await searchList(term);
+        setResults(listResults);
+      } finally {
+        setSearching(false);
+      }
+    },
+    []
+  );
+
+  const handleSelectResult = React.useCallback(async (result: BackendItem) => {
+    const selectedName = (result.name ?? '').trim();
+    if (!selectedName) return;
+    const price =
+      typeof result.price === 'number'
+        ? result.price
+        : typeof result.price === 'string'
+        ? parseFloat(result.price.replace(/[^0-9.]/g, '')) || 0
+        : 0;
+
+    setName(selectedName);
+    setPriceStr(price.toFixed(2));
+    setResults([]);
+
+    // Ensure backend temp item is aligned for add flow
+    try {
+      await searchItem(selectedName);
+    } catch {
+      // ignore network errors here; fallback will still work
+    }
+  }, []);
+
+  const handleNameChange = (text: string) => {
+    setName(text);
+    // clear previous results; user must press enter to search again
+    setResults([]);
+  };
+
+  const handleSubmitSearch = () => {
+    const term = name.trim();
+    if (term.length >= 2) {
+      void performSearch(term);
+    } else {
+      setResults([]);
     }
   };
 
@@ -74,7 +113,12 @@ export function ListItemModal({
         return;
       }
       const price = parseFloat(priceStr) || 0;
-      const apiResult = await addItem(displayName);
+      try {
+        await searchItem(displayName);
+      } catch {
+        // ignore, backend will simply reuse last temp item if available
+      }
+      await addItem(displayName);
       await onAddFromSearch?.(displayName, price);
       onClose();
       return;
@@ -109,15 +153,44 @@ export function ListItemModal({
               placeholder={isNewItem ? 'Enter ingredient...' : 'Search...'}
               placeholderTextColor={Colors.grey}
               value={name}
-              onChangeText={setName}
-              onSubmitEditing={isNewItem ? handleSearch : undefined}
-              returnKeyType={isNewItem ? 'search' : 'done'}
+              onChangeText={handleNameChange}
+              onSubmitEditing={handleSubmitSearch}
+              returnKeyType="search"
               editable={!searching}
             />
             {searching && (
               <ActivityIndicator size="small" color={Colors.darkGreen} style={styles.searchSpinner} />
             )}
           </View>
+          {results.length > 0 && (
+            <View style={styles.resultsContainer}>
+              <ScrollView keyboardShouldPersistTaps="handled">
+                {results.map((r, index) => {
+                  const resultName = r.name ?? '';
+                  const rawPrice = r.price;
+                  let parsedPrice = 0;
+                  if (typeof rawPrice === 'number') parsedPrice = rawPrice;
+                  else if (typeof rawPrice === 'string') {
+                    const n = parseFloat(rawPrice.replace(/[^0-9.]/g, ''));
+                    parsedPrice = isNaN(n) ? 0 : n;
+                  }
+                  return (
+                    <Pressable
+                      key={`${resultName}-${index}`}
+                      style={styles.resultRow}
+                      onPress={() => void handleSelectResult(r)}>
+                      <Text style={styles.resultName} numberOfLines={2}>
+                        {resultName}
+                      </Text>
+                      {parsedPrice > 0 && (
+                        <Text style={styles.resultPrice}>${parsedPrice.toFixed(2)}</Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
           <View style={styles.priceRow}>
             <Text style={styles.priceLabel}>Price:</Text>
             <View style={styles.priceInputWrap}>
@@ -167,10 +240,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10.2,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.16,
+    shadowRadius: 8,
+    elevation: 3,
   },
   searchRow: {
     marginBottom: 16,
@@ -190,6 +263,37 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 24,
     fontWeight: '700',
+    color: Colors.darkGreen,
+  },
+  resultsContainer: {
+    maxHeight: 200,
+    marginBottom: 12,
+    marginTop: -4,
+    backgroundColor: Colors.background,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  resultRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+  },
+  resultName: {
+    flex: 1,
+    marginRight: 8,
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.darkGreen,
+  },
+  resultPrice: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    fontWeight: '600',
     color: Colors.darkGreen,
   },
   priceRow: {
