@@ -63,6 +63,26 @@ class ShoppingList:
         self.budget = budget
         self.remainingBudget = budget
 
+    def searchItem(self, item: str):
+        publix_results = product_to_data.publix_search_limited(item)
+        aldi_results = product_to_data.aldi(item)
+        tj_results = product_to_data.tjs(item)
+
+        if not publix_results or not aldi_results or not tj_results:
+            return
+
+        p = publix_results[0]
+        a = aldi_results[0]
+        t = tj_results[0]
+
+        
+        if p["price"] <= t["price"] and p["price"] <= a["price"]:
+            return Item(p, item).to_dict()
+        elif t["price"] <= p["price"] and t["price"] <= a["price"]:
+            return Item(t, item).to_dict()
+        else:
+            return Item(a, item).to_dict()
+
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
         aldi_results = product_to_data.aldi(item)
@@ -75,6 +95,7 @@ class ShoppingList:
         a = aldi_results[0]
         t = tj_results[0]
 
+        
         if p["price"] <= t["price"] and p["price"] <= a["price"]:
             self.publix.append(Item(p, item))
             self.remainingBudget -= p["price"]
