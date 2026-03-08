@@ -45,6 +45,13 @@ class Expenses:
         if self.shopping_list:
             self.shopping_list.changeBudget(newBudget)
 
+    def exportData(self):
+        return {
+            "budget": self.budget,
+            "remainingBudget": self.remainingBudget,
+            "items": [i.to_dict() for i in self.items]
+        }
+
         
 class ShoppingList:
     def __init__(self, budget: float = 0, expenses: Expenses = None):
@@ -80,28 +87,37 @@ class ShoppingList:
 
         self.items.append(item)
 
-    def removeItemClass(self, i: Item):
-        if i.store.lower() == "aldi":
-            self.aldis.remove(i)
-        elif i.store.lower() == "trader joe's" or i.store.lower() == "trader joes":
-            self.tjs.remove(i)
-        elif i.store == "publix":
-            self.publix.remove(i)
+    def removeItemClass(self, item_name: str):
+        # Search each store list for the Item with matching name
+        for lst in [self.aldis, self.tjs, self.publix]:
+            for item in lst:
+                if item.name == item_name:
+                    lst.remove(item)
+                    self.remainingBudget += item.price
+                    if item.category in self.items:
+                        self.items.remove(item.category)
+                    return
 
-        self.remainingBudget += i.price
-        self.items.remove(i.category)
+    def deselectItem(self, item_name: str, expenses: Expenses):
+        # Look in all store lists
+        for lst in [self.aldis, self.tjs, self.publix]:
+            for item in lst:
+                if item.name == item_name:
+                    item.selected = False
+                    if self.expenses:
+                        self.expenses.removeItem(item)
+                    return
 
-    def deselectItem(self, i: Item, expenses: Expenses):
-        i.selected = False
-
-        if self.expenses:
-            self.expenses.removeItem(i)
         
-    def selectItem(self, i: Item, expenses: Expenses):
-        i.selected = True
-
-        if self.expenses:
-            self.expenses.addItem(i)
+    def selectItem(self, item_name: str, expenses: Expenses):
+        # Look in all store lists
+        for lst in [self.aldis, self.tjs, self.publix]:
+            for item in lst:
+                if item.name == item_name:
+                    item.selected = True
+                    if self.expenses:
+                        self.expenses.addItem(item)
+                    return
 
     def changeBudget(self, newBudget: float):
         diff = self.budget - self.remainingBudget
@@ -119,8 +135,9 @@ class ShoppingList:
             "publix": [i.to_dict() for i in self.publix],
             "aldi": [i.to_dict() for i in self.aldis],
             "trader_joes": [i.to_dict() for i in self.tjs],
-            "remainingBudget": self.remainingBudget,
-            "budget" : self.budget
+            "categories": self.items,
+            "budget": self.budget,
+            "remainingBudget": self.remainingBudget
         }
     
 class RecipeCard:
@@ -138,6 +155,12 @@ class RecipeCard:
         for ingredient in self.ingredients:
             if ingredient not in shopList.items:
                 shopList.addItem(ingredient)
+    
+    def exportData(self):
+        return {
+            "name": self.name,
+            "ingredients": self.ingredients
+        }
 
 class Recipes:
     def __init__(self):
@@ -148,3 +171,6 @@ class Recipes:
 
     def deleteCard(self, card: RecipeCard):
         self.recipeCards.remove(card)
+
+    def exportData(self):
+        return [card.exportData() for card in self.recipeCards]
