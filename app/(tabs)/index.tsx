@@ -8,6 +8,12 @@ import { RecipeCard } from '@/components/recipe-card';
 import { RecipeCardModal } from '@/components/recipe-card-modal';
 import { Colors } from '@/constants/Colors';
 import {
+  getRecipes,
+  addRecipe,
+  editRecipe,
+  deleteRecipe,
+} from '@/services/api';
+import {
   SAMPLE_RECIPES,
   type SampleRecipe,
 } from '@/data/sample-recipes';
@@ -16,6 +22,20 @@ export default function HomeScreen() {
   const [recipes, setRecipes] = React.useState<SampleRecipe[]>(SAMPLE_RECIPES);
   const [modalRecipe, setModalRecipe] = React.useState<SampleRecipe | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    getRecipes().then((data) => {
+      if (data && data.length > 0) {
+        setRecipes(
+          data.map((r, i) => ({
+            id: String(i + 1),
+            name: r.name ?? 'Untitled',
+            ingredients: r.ingredients ?? [],
+          }))
+        );
+      }
+    });
+  }, []);
 
   const openNew = () => {
     setModalRecipe(null);
@@ -27,31 +47,46 @@ export default function HomeScreen() {
     setModalVisible(true);
   };
 
-  const handleDone = (data: { name: string; ingredients: string[]; price: number }) => {
+  const handleDone = async (data: { name: string; ingredients: string[] }) => {
     if (modalRecipe) {
-      setRecipes((prev) =>
-        prev.map((r) =>
-          r.id === modalRecipe.id
-            ? { ...r, name: data.name, ingredients: data.ingredients, price: data.price }
-            : r
-        )
-      );
+      const updated = await editRecipe({
+        old_name: modalRecipe.name,
+        name: data.name,
+        ingredients: data.ingredients,
+      });
+      if (Array.isArray(updated)) {
+        setRecipes(updated.map((r, i) => ({ id: String(i + 1), name: r.name, ingredients: r.ingredients ?? [] })));
+      } else {
+        setRecipes((prev) =>
+          prev.map((r) =>
+            r.id === modalRecipe.id ? { ...r, name: data.name, ingredients: data.ingredients } : r
+          )
+        );
+      }
     } else {
-      setRecipes((prev) => [
-        ...prev,
-        {
-          id: String(Date.now()),
-          name: data.name,
-          ingredients: data.ingredients,
-          price: data.price,
-        },
-      ]);
+      const updated = await addRecipe({ name: data.name, ingredients: data.ingredients });
+      if (Array.isArray(updated)) {
+        setRecipes(updated.map((r, i) => ({ id: String(i + 1), name: r.name, ingredients: r.ingredients ?? [] })));
+      } else {
+        setRecipes((prev) => [
+          ...prev,
+          { id: String(Date.now()), name: data.name, ingredients: data.ingredients },
+        ]);
+      }
     }
     setModalVisible(false);
   };
 
-  const handleDelete = (id: string) => {
-    setRecipes((prev) => prev.filter((r) => r.id !== id));
+  const handleDelete = async (id: string) => {
+    const rec = recipes.find((r) => r.id === id);
+    if (rec) {
+      const updated = await deleteRecipe({ name: rec.name });
+      if (Array.isArray(updated)) {
+        setRecipes(updated.map((r, i) => ({ id: String(i + 1), name: r.name, ingredients: r.ingredients ?? [] })));
+      } else {
+        setRecipes((prev) => prev.filter((r) => r.id !== id));
+      }
+    }
     setModalVisible(false);
   };
 
@@ -72,7 +107,6 @@ export default function HomeScreen() {
               key={recipe.id}
               title={recipe.name}
               ingredients={recipe.ingredients}
-              costBadge={recipe.price}
               onPress={() => openEdit(recipe)}
               onInfoPress={() => openEdit(recipe)}
             />

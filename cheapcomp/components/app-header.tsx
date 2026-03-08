@@ -21,7 +21,7 @@ export function AppHeader() {
           <GatorChompsLogo color={Colors.darkGreen} />
         </View>
         <View style={styles.budgetContainer}>
-          <Text style={styles.budgetLabel}>Budget: </Text>
+          <Text style={styles.budgetLabel}>Balance: </Text>
           <Text style={styles.budgetValue}>${displayBudget}</Text>
         </View>
       </View>

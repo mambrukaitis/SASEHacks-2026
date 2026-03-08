@@ -9,9 +9,9 @@ app = Flask(__name__)
 
 expenses = Expenses(100)
 shopping_list = ShoppingList(100, expenses)
+expenses.shopping_list = shopping_list
 recipes = Recipes()
-tempItem = Item()
-
+tempItem = None
 
 
 # ---------------------------------------------------
@@ -20,33 +20,36 @@ tempItem = Item()
 
 @app.route("/shopping_list", methods=["GET"])
 def get_shopping_list():
-
     data = shopping_list.exportData()
-
     data["budget"] = expenses.budget
     data["remainingBudget"] = expenses.remainingBudget
-
+    data["projectedRemaining"] = shopping_list.remainingBudget
     return jsonify(data)
 
 
-# --- Add item ---
-@app.route("/add_item", methods=["POST"])
-def add_item():
-    data = request.json
-
-    shopping_list.addItemItem(tempItem)
-
-    return get_shopping_list()
-
-# --- Search item ---
 @app.route("/search_item", methods=["POST"])
 def search_item():
-    data = request.json
-    #data is string in text box
     global tempItem
-    tempItem = shopping_list.searchItem(data["name"])
-
+    data = request.json or {}
+    name = data.get("name", "")
+    tempItem = shopping_list.searchItem(name) if name else None
+    if tempItem is None:
+        return jsonify({})
     return jsonify(tempItem.to_dict())
+
+
+@app.route("/add_item", methods=["POST"])
+def add_item():
+    global tempItem
+    data = request.json or {}
+    name = data.get("name")
+    if name:
+        shopping_list.addItem(name)
+        tempItem = None
+    elif tempItem is not None:
+        shopping_list.addItemItem(tempItem)
+        tempItem = None
+    return get_shopping_list()
 
 
 

@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/app-header';
 import { ListItemModal } from '@/components/list-item-modal';
 import { Colors } from '@/constants/Colors';
+import { useBudget } from '@/contexts/budget-context';
 import {
   useShoppingList,
   type ShoppingListItem,
@@ -21,11 +22,13 @@ function storeFromFilter(f: FilterType): StoreName | 'all' {
 }
 
 export default function ListScreen() {
-  const { items, toggleItem, updateItem, removeItem } = useShoppingList();
+  const { items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend } = useShoppingList();
+  const { budget } = useBudget();
   const [selectedFilter, setSelectedFilter] = React.useState<FilterType>('Overall');
-  const [modalItem, setModalItem] = React.useState<ShoppingListItem | null>(null);
+  const [modalItem, setModalItem] = React.useState<ShoppingListItem | null | 'new'>(null);
   const insets = useSafeAreaInsets();
 
+  const projectedBalance = budget - totalCost;
   const storeFilter = storeFromFilter(selectedFilter);
 
   const grouped = React.useMemo(() => {
@@ -46,6 +49,10 @@ export default function ListScreen() {
 
   const handleItemPress = (item: ShoppingListItem) => {
     setModalItem(item);
+  };
+
+  const handleAddNew = () => {
+    setModalItem('new');
   };
 
   const handleToggle = (e: any, item: ShoppingListItem) => {
@@ -129,7 +136,12 @@ export default function ListScreen() {
           );
         })}
 
-        <TouchableOpacity style={styles.addButton} activeOpacity={0.8}>
+        <View style={styles.projectedPill}>
+          <Text style={styles.projectedPillLabel}>Projected Balance</Text>
+          <Text style={styles.projectedPillValue}>${projectedBalance.toFixed(2)}</Text>
+        </View>
+
+        <TouchableOpacity style={styles.addButton} onPress={handleAddNew} activeOpacity={0.8}>
           <MaterialIcons name="add" size={24} color={Colors.background} />
           <Text style={styles.addButtonText}>Add New</Text>
         </TouchableOpacity>
@@ -137,10 +149,18 @@ export default function ListScreen() {
 
       <ListItemModal
         visible={modalItem !== null}
-        item={modalItem}
+        item={modalItem === 'new' ? null : modalItem}
+        isNewItem={modalItem === 'new'}
         onClose={() => setModalItem(null)}
         onDone={handleDone}
         onDelete={handleDelete}
+        onAddFromSearch={async (name, price) => {
+          const success = await refreshFromBackend();
+          if (!success) {
+            addItem({ name, price, store: 'Publix', checked: false });
+          }
+          setModalItem(null);
+        }}
       />
     </View>
   );
@@ -263,6 +283,30 @@ const styles = StyleSheet.create({
   },
   editButton: {
     padding: 4,
+  },
+  projectedPill: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.lightPurple,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 30,
+    marginTop: 8,
+    marginBottom: 8,
+    gap: 6,
+  },
+  projectedPillLabel: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.background,
+  },
+  projectedPillValue: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.background,
   },
   addButton: {
     flexDirection: 'row',

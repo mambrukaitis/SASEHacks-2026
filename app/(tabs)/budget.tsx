@@ -103,7 +103,7 @@ export default function BudgetScreen() {
             />
           </View>
           <View style={styles.remainingRow}>
-            <Text style={styles.remainingLabel}>Remaining:</Text>
+            <Text style={styles.remainingLabel}>Balance:</Text>
             <Text style={styles.remainingValue}>${remaining.toFixed(2)}</Text>
           </View>
           <Pressable style={styles.pencilButton} onPress={handlePencilPress} hitSlop={12}>

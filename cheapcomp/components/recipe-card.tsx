@@ -6,7 +6,6 @@ import { Colors } from '@/constants/Colors';
 interface RecipeCardProps {
   title: string;
   ingredients: string[];
-  costBadge?: number;
   onPress?: () => void;
   onInfoPress?: () => void;
 }
@@ -14,17 +13,11 @@ interface RecipeCardProps {
 export function RecipeCard({
   title,
   ingredients,
-  costBadge,
   onPress,
   onInfoPress,
 }: RecipeCardProps) {
   return (
     <Pressable style={styles.card} onPress={onPress}>
-      {costBadge != null && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{costBadge}</Text>
-        </View>
-      )}
       <View style={styles.content}>
         <View style={styles.titleRow}>
           <View style={styles.underline} />
@@ -62,22 +55,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.31,
     shadowRadius: 19.1,
     elevation: 6,
-  },
-  badge: {
-    position: 'absolute',
-    top: -8,
-    left: -8,
-    backgroundColor: Colors.delete,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    zIndex: 1,
-  },
-  badgeText: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.background,
   },
   content: {
     flex: 1,

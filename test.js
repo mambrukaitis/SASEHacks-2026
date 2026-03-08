@@ -1,57 +1,100 @@
 const API_BASE = "http://10.136.194.45:5001";
 
-
 export async function getShoppingList() {
-  const res = await fetch(`${API_BASE}/shopping_list`);
-  return await res.json();
-}
-
-export async function getBudget() {
   try {
-    const response = await fetch("http://10.136.194.45:5001/budget");
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch budget");
-    }
-
-    const data = await response.json();
-
-    return data.budget; // returns the number
-  } catch (error) {
-    console.error("Error getting budget:", error);
+    const res = await fetch(`${API_BASE}/shopping_list`);
+    if (!res.ok) throw new Error("Failed");
+    return await res.json();
+  } catch (e) {
     return null;
   }
 }
 
-// export async function searchItem(name) {
-//   const res = await fetch(`${API_BASE}/search_item`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify({
-//       name: name
-//     })
-//   });
+export async function getBudget() {
+  try {
+    const response = await fetch(`${API_BASE}/budget`);
+    if (!response.ok) throw new Error("Failed");
+    const data = await response.json();
+    return data.budget;
+  } catch (error) {
+    return null;
+  }
+}
 
-//   return await res.json();
-// }
+export async function searchItem(name) {
+  try {
+    const res = await fetch(`${API_BASE}/search_item`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
 
+export async function addItem(name) {
+  try {
+    const res = await fetch(`${API_BASE}/add_item`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
 
-// export async function addItem(name) {
-//   const res = await fetch(`${API_BASE}/add_item`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json"
-//     },
-//     body: JSON.stringify({
-//       name: name
-//     })
-//   });
+export async function getRecipes() {
+  try {
+    const res = await fetch(`${API_BASE}/recipes`);
+    if (!res.ok) throw new Error("Failed");
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
 
-//   return await res.json();
-// }
+export async function addRecipe(data) {
+  try {
+    const res = await fetch(`${API_BASE}/add_recipe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
 
+export async function editRecipe(data) {
+  try {
+    const res = await fetch(`${API_BASE}/edit_recipe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function deleteRecipe(data) {
+  try {
+    const res = await fetch(`${API_BASE}/delete_recipe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
 
 export async function removeItem(name, store) {
   const res = await fetch(`${API_BASE}/remove_item`, {

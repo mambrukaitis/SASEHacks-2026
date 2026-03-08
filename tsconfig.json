@@ -1,8 +1,4 @@
 {
-  "compilerOptions": {
-    "paths": {
-      "@/*": ["./cheapcomp/*"]
-    }
-  },
+  "compilerOptions": {},
   "extends": "expo/tsconfig.base"
 }
