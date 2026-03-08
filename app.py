@@ -10,6 +10,8 @@ app = Flask(__name__)
 expenses = Expenses(100)
 shopping_list = ShoppingList(100, expenses)
 recipes = Recipes()
+tempItem = {}
+
 
 
 # ---------------------------------------------------
@@ -27,13 +29,25 @@ def get_shopping_list():
     return jsonify(data)
 
 
+# --- Add item ---
 @app.route("/add_item", methods=["POST"])
 def add_item():
-
     data = request.json
-    shopping_list.addItem(data["name"])
+
+    shopping_list.addItem(temp["name"])
 
     return get_shopping_list()
+
+# --- Search item ---
+@app.route("/search_item", methods=["POST"])
+def search_item():
+    data = request.json
+    #data is string in text box
+    tempItem = shopping_list.searchItem(data)
+
+    return get_shopping_list()
+
+
 
 
 @app.route("/remove_item", methods=["POST"])
