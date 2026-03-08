@@ -14,18 +14,16 @@ interface RecipeCardProps {
 export function RecipeCard({
   title,
   ingredients,
-  onPress,
   onInfoPress,
 }: RecipeCardProps) {
-  const handlePress = () => {
+  const handleCardPress = () => {
     addRecipeIngredients(ingredients).catch(() => {});
-    if (onPress) onPress();
+    // no onPress here — we do NOT open the edit modal
   };
 
   return (
-    <View style={styles.card}>
-      {/* Make the content pressable for adding ingredients */}
-      <Pressable style={styles.content} onPress={handlePress}>
+    <Pressable style={styles.card} onPress={handleCardPress}>
+      <View style={styles.content}>
         <View style={styles.titleRow}>
           <View style={styles.underline} />
           <Text style={styles.title} numberOfLines={1}>
@@ -42,9 +40,9 @@ export function RecipeCard({
             </View>
           ))}
         </View>
-      </Pressable>
+      </View>
 
-      {/* Info button stays separate */}
+      {/* Info button opens edit modal */}
       <Pressable
         style={styles.infoButton}
         onPress={onInfoPress}
@@ -52,7 +50,7 @@ export function RecipeCard({
       >
         <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
       </Pressable>
-    </View>
+    </Pressable>
   );
 }
 
