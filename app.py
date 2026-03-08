@@ -41,7 +41,7 @@ def search_item():
 @app.route("/add_item", methods=["POST"])
 def add_item():
     global tempItem
-    data = request.json or {}
+    #data = request.json or {}
     #name = data.get("name")
     shopping_list.addItemItem(tempItem)
 
