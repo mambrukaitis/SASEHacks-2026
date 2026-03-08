@@ -114,11 +114,16 @@ class ShoppingList:
         if item is None:
             print("item is none fix now")
         if (item.store == "Publix"):
+            print (item + "2" + "p")
             self.publix.append(item)
         elif (item.store == "Trader Joe's"):
+            print (item + "2" + "a")
             self.tjs.append(item)
         else:
+            print(item + "2" + "a")
             self.aldis.append(item)
+        
+        print("additeitem ran")
         
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
@@ -132,17 +137,20 @@ class ShoppingList:
         a = aldi_results[0]
         t = tj_results[0]
 
-        
         if p["price"] <= t["price"] and p["price"] <= a["price"]:
             self.publix.append(Item(p, item))
             self.remainingBudget -= p["price"]
+            print(p + "1" + "p")
         elif t["price"] <= p["price"] and t["price"] <= a["price"]:
             self.tjs.append(Item(t, item))
             self.remainingBudget -= t["price"]
+            print(t + "1" + "t")
         else:
             self.aldis.append(Item(a, item))
             self.remainingBudget -= a["price"]
+            print (a + "1" + "a")
 
+        print("add item ran")
         self.items.append(item)
 
     def removeItemClass(self, item_name: str):
