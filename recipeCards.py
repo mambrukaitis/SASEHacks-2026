@@ -1,22 +1,6 @@
 import json
 import product_to_data
 
-class Recipes:
-    def __init__(self):
-        self.recipeCards = []    # a list of recipe cards
-        self.ingre
-    
-    def addCard(self, i: list, nm: str):
-        self.recipeCards.append(RecipeCard(i, nm))
-    
-class RecipeCard:
-    def __init__(self, i: list):
-        self.selec = []
-        self.notselec = []
-
-    def addIng(self, i: str):
-        self.card.append(i)
-
 class Item:
     def __init__(self, itemDict: dict | None = None, i: str = ""):
         if itemDict is None:
@@ -39,13 +23,38 @@ class Item:
             "selected": self.selected
         }
     
+class Expenses:
+    def __init__(self, budget: float =0, shopList=None):
+        self.budget = budget
+        self.remainingBudget = budget
+        self.items = [] # a list of selected Items
+
+    def addItem(self, item: Item):
+        self.items.append(item)
+        self.remainingBudget -= item.price
+
+    def removeItem(self, item: Item):
+        self.items.remove(item)
+        self.remainingBudget += item.price
+    
+    def changeBudget(self, newBudget: float):
+        diff = self.budget - self.remainingBudget
+        self.budget = newBudget
+        self.remainingBudget  = self.budget - diff
+       
+        if self.shopping_list:
+            self.shopping_list.changeBudget(newBudget)
+
+        
 class ShoppingList:
-    def __init__(self, budget: float = 0):
+    def __init__(self, budget: float = 0, expenses: Expenses = None):
         self.aldis = []
         self.tjs = []
         self.publix = [] # store is a list of Item objects
+        self.items = [] # list of "categories"
+        self.expenses = expenses
         self.budget = budget
-        self.remaingingBudget = budget
+        self.remainingBudget = budget
 
     def addItem(self, item: str):
         publix_results = product_to_data.publix_search_limited(item)
@@ -61,16 +70,17 @@ class ShoppingList:
 
         if p["price"] <= t["price"] and p["price"] <= a["price"]:
             self.publix.append(Item(p, item))
-            self.remaingingBudget -= p["price"]
+            self.remainingBudget -= p["price"]
         elif t["price"] <= p["price"] and t["price"] <= a["price"]:
             self.tjs.append(Item(t, item))
-            self.remaingingBudget -= t["price"]
+            self.remainingBudget -= t["price"]
         else:
             self.aldis.append(Item(a, item))
-            self.remaingingBudget -= a["price"]
+            self.remainingBudget -= a["price"]
 
+        self.items.append(item)
 
-    def removeItem(self, i: Item):
+    def removeItemClass(self, i: Item):
         if i.store.lower() == "aldi":
             self.aldis.remove(i)
         elif i.store.lower() == "trader joe's" or i.store.lower() == "trader joes":
@@ -78,26 +88,63 @@ class ShoppingList:
         elif i.store == "publix":
             self.publix.remove(i)
 
-        self.remaingingBudget += i.price
+        self.remainingBudget += i.price
+        self.items.remove(i.category)
 
-    def deselectItem(self, i: Item):
+    def deselectItem(self, i: Item, expenses: Expenses):
         i.selected = False
-        self.removeItem(i)
+
+        if self.expenses:
+            self.expenses.removeItem(i)
         
-    def selectItem(self, i: Item):
+    def selectItem(self, i: Item, expenses: Expenses):
         i.selected = True
-        self.addItem(i.category)
+
+        if self.expenses:
+            self.expenses.addItem(i)
 
     def changeBudget(self, newBudget: float):
-        diff = self.budget - self.remaingingBudget
+        diff = self.budget - self.remainingBudget
         self.budget = newBudget
-        self.remaingingBudget  = self.budget - diff
+        self.remainingBudget  = self.budget - diff
+
+    def removeAll(self):
+        for a in self.aldis: self.aldis.remove(a)
+        for p in self.publix: self.publix.remove(p)
+        for t in self.tjs: self.tjs.remove(t)
+        for i in self.items: self.items.remove(i)
 
     def exportData(self):
         return {
             "publix": [i.to_dict() for i in self.publix],
             "aldi": [i.to_dict() for i in self.aldis],
             "trader_joes": [i.to_dict() for i in self.tjs],
-            "remainingBudget": self.remaingingBudget,
+            "remainingBudget": self.remainingBudget,
             "budget" : self.budget
         }
+    
+class RecipeCard:
+    def __init__(self, i: list | None = None, nm: str = ""):
+        if i is None:
+            i = []
+
+        self.ingredients = i
+        self.name = nm
+
+    def addIngredient(self, i: str):
+        self.ingredients.append(i)
+
+    def addToShopping(self, shopList: ShoppingList):
+        for ingredient in self.ingredients:
+            if ingredient not in shopList.items:
+                shopList.addItem(ingredient)
+
+class Recipes:
+    def __init__(self):
+        self.recipeCards = []    # a list of recipe cards
+    
+    def addCard(self, i: list, nm: str):
+        self.recipeCards.append(RecipeCard(i, nm))
+
+    def deleteCard(self, card: RecipeCard):
+        self.recipeCards.remove(card)

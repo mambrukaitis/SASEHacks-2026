@@ -180,8 +180,8 @@ def publix_search_limited(product, brand=""):
     # otherwise return 10 cheapest
     results_sorted = sorted(results, key=lambda x: price_to_float(x.get("price")))
     return results_sorted[:5]
+
 if __name__ == "__main__":
-    
 
     user_term = input("\nEnter a product name to search: ")
     user_brand = input("Enter a brand to prioritize (optional): ")
