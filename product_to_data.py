@@ -187,7 +187,6 @@ def publix_search_limited(product, brand=""):
     return results_sorted[:5]
 
 if __name__ == "__main__":
-    print(tj("milk"))
 
     # user_term = input("\nEnter a product name to search: ")
     # user_brand = input("Enter a brand to prioritize (optional): ")
