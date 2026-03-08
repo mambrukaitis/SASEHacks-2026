@@ -7,8 +7,7 @@ import { addRecipeIngredients } from '@/services/api';
 interface RecipeCardProps {
   title: string;
   ingredients: string[];
-  onPress?: () => void;
-  onInfoPress?: () => void;
+  onInfoPress?: () => void; // only info button triggers edit
 }
 
 export function RecipeCard({
@@ -16,20 +15,25 @@ export function RecipeCard({
   ingredients,
   onInfoPress,
 }: RecipeCardProps) {
+  // Clicking the main card adds ingredients
   const handleCardPress = () => {
-    addRecipeIngredients(ingredients).catch(() => {});
-    // no onPress here — we do NOT open the edit modal
+    addRecipeIngredients(ingredients).catch((err) => {
+      console.error('Failed to add recipe ingredients', err);
+    });
   };
 
   return (
     <Pressable style={styles.card} onPress={handleCardPress}>
       <View style={styles.content}>
+        {/* Title */}
         <View style={styles.titleRow}>
           <View style={styles.underline} />
           <Text style={styles.title} numberOfLines={1}>
             {title}
           </Text>
         </View>
+
+        {/* Ingredients list */}
         <View style={styles.ingredients}>
           {ingredients.map((ingredient, i) => (
             <View key={i} style={styles.ingredientRow}>
@@ -42,13 +46,17 @@ export function RecipeCard({
         </View>
       </View>
 
-      {/* Info button opens edit modal */}
+      {/* Info button (edit modal) */}
       <Pressable
         style={styles.infoButton}
         onPress={onInfoPress}
         hitSlop={8}
       >
-        <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
+        <MaterialIcons
+          name="info-outline"
+          size={22}
+          color={Colors.darkGreen}
+        />
       </Pressable>
     </Pressable>
   );
