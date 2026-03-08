@@ -3,8 +3,13 @@ from recipeCards import ShoppingList, Item   # change to your actual filename
 
 app = Flask(__name__)
 
-shopping_list = ShoppingList()
-tempItem = {}
+# ---------------------------------------------------
+# GLOBAL OBJECTS
+# ---------------------------------------------------
+
+expenses = Expenses(100)
+shopping_list = ShoppingList(100, expenses)
+recipes = Recipes()
 
 
 # --- Get shopping list data ---
@@ -31,6 +36,8 @@ def search_item():
     tempItem = shopping_list.searchItem(data)
 
     return get_shopping_list()
+
+
 
 
 # --- Remove all items ---
