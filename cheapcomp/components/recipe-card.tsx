@@ -2,6 +2,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
+import { addRecipeIngredients } from '@/services/api';
 
 interface RecipeCardProps {
   title: string;
@@ -16,8 +17,19 @@ export function RecipeCard({
   onPress,
   onInfoPress,
 }: RecipeCardProps) {
+  // Handler that calls the API and also triggers any existing onPress
+  const handlePress = () => {
+    // Call your API with the ingredients array
+    addRecipeIngredients(ingredients).catch(() => {});
+
+    // Keep the original onPress behavior if it exists
+    if (onPress) {
+      onPress();
+    }
+  };
+
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable style={styles.card} onPress={handlePress}>
       <View style={styles.content}>
         <View style={styles.titleRow}>
           <View style={styles.underline} />
@@ -36,8 +48,17 @@ export function RecipeCard({
           ))}
         </View>
       </View>
-      <Pressable style={styles.infoButton} onPress={onInfoPress} hitSlop={8}>
-        <MaterialIcons name="info-outline" size={22} color={Colors.darkGreen} />
+      {/* Info button stays separate, clicking it won't trigger handlePress */}
+      <Pressable
+        style={styles.infoButton}
+        onPress={onInfoPress}
+        hitSlop={8}
+      >
+        <MaterialIcons
+          name="info-outline"
+          size={22}
+          color={Colors.darkGreen}
+        />
       </Pressable>
     </Pressable>
   );
