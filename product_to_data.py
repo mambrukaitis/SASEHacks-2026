@@ -5,7 +5,7 @@ import nltk
 
 
 try:
-    with open("publix_data.json", "r", encoding="utf-8") as f:
+    with open("cleaned_final.json", "r", encoding="utf-8") as f:
         PUBLIX_PRODUCTS = json.load(f)
 except json.JSONDecodeError as e:
     print("JSON decode error:", e)
