@@ -74,18 +74,23 @@ class ShoppingList:
     
         if  len(publix_results) == 0 and len(aldi_results) == 0 and  len(tj_results) == 0:
             return Item({}, "")  # return an empty Item instead of None
+
+        temp = []
+        if (len(publix_results) != 0):
+            p = publix_results[0]
+            temp.append(p)
+        if (len(publix_results) != 0):
+            a = aldi_results[0]
+            temp.append(a)
+        if (len(publix_results) != 0):
+            t = tj_results[0]
+            temp.append(t)
+        temp = sorted(temp, key=lambda x: x["price"])
+
+        temp = sorted(temp)
+        return Item(temp[0], item)
     
-        p = publix_results[0]
-        a = aldi_results[0]
-        t = tj_results[0]
-    
-        # pick the cheapest
-        cheapest = min(
-            [(p, p["price"]), (a, a["price"]), (t, t["price"])],
-            key=lambda x: x[1]
-        )[0]
-    
-        return Item(cheapest, item)
+        
     
         # publix_results = product_to_data.publix_search_limited(item)
         # aldi_results = product_to_data.aldi(item)
