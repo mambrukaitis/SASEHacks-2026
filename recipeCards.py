@@ -79,10 +79,10 @@ class ShoppingList:
         if (len(publix_results) != 0):
             p = publix_results[0]
             temp.append(p)
-        if (len(publix_results) != 0):
+        if (len(aldi_results) != 0):
             a = aldi_results[0]
             temp.append(a)
-        if (len(publix_results) != 0):
+        if (len(tj_results) != 0):
             t = tj_results[0]
             temp.append(t)
         temp = sorted(temp, key=lambda x: x["price"])
