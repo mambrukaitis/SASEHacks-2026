@@ -1,40 +1,60 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import * as React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
 import { NewRecipeCard } from '@/components/new-recipe-card';
 import { RecipeCard } from '@/components/recipe-card';
+import { RecipeCardModal } from '@/components/recipe-card-modal';
 import { Colors } from '@/constants/Colors';
-
-const RECIPES = [
-  {
-    id: '1',
-    title: "Mama's Pasta",
-    ingredients: ['Penne', 'Tomatoes', 'Zucchini', 'Alfredo Sauce', 'Pine Nuts'],
-  },
-  {
-    id: '2',
-    title: 'Hamburgers',
-    ingredients: ['Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes'],
-  },
-  {
-    id: '3',
-    title: 'Spaghetti',
-    ingredients: ['Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes'],
-  },
-  {
-    id: '4',
-    title: 'Turtle Soup',
-    ingredients: ['Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes'],
-  },
-  {
-    id: '5',
-    title: 'Sugar Cookies',
-    ingredients: ['Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes', 'Tomatoes'],
-  },
-];
+import {
+  SAMPLE_RECIPES,
+  type SampleRecipe,
+} from '@/data/sample-recipes';
 
 export default function HomeScreen() {
+  const [recipes, setRecipes] = React.useState<SampleRecipe[]>(SAMPLE_RECIPES);
+  const [modalRecipe, setModalRecipe] = React.useState<SampleRecipe | null>(null);
+  const [modalVisible, setModalVisible] = React.useState(false);
+
+  const openNew = () => {
+    setModalRecipe(null);
+    setModalVisible(true);
+  };
+
+  const openEdit = (recipe: SampleRecipe) => {
+    setModalRecipe(recipe);
+    setModalVisible(true);
+  };
+
+  const handleDone = (data: { name: string; ingredients: string[]; price: number }) => {
+    if (modalRecipe) {
+      setRecipes((prev) =>
+        prev.map((r) =>
+          r.id === modalRecipe.id
+            ? { ...r, name: data.name, ingredients: data.ingredients, price: data.price }
+            : r
+        )
+      );
+    } else {
+      setRecipes((prev) => [
+        ...prev,
+        {
+          id: String(Date.now()),
+          name: data.name,
+          ingredients: data.ingredients,
+          price: data.price,
+        },
+      ]);
+    }
+    setModalVisible(false);
+  };
+
+  const handleDelete = (id: string) => {
+    setRecipes((prev) => prev.filter((r) => r.id !== id));
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <AppHeader />
@@ -46,15 +66,15 @@ export default function HomeScreen() {
         <Text style={styles.title}>Recipes</Text>
 
         <View style={styles.grid}>
-          <NewRecipeCard onPress={() => {}} />
-          {RECIPES.map((recipe) => (
+          <NewRecipeCard onPress={openNew} />
+          {recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
-              title={recipe.title}
+              title={recipe.name}
               ingredients={recipe.ingredients}
-              costBadge={recipe.costBadge}
-              onPress={() => {}}
-              onInfoPress={() => {}}
+              costBadge={recipe.price}
+              onPress={() => openEdit(recipe)}
+              onInfoPress={() => openEdit(recipe)}
             />
           ))}
         </View>
@@ -68,6 +88,14 @@ export default function HomeScreen() {
           style={styles.gradient}
         />
       </View>
+
+      <RecipeCardModal
+        visible={modalVisible}
+        recipe={modalRecipe}
+        onClose={() => setModalVisible(false)}
+        onDone={handleDone}
+        onDelete={modalRecipe ? handleDelete : undefined}
+      />
     </View>
   );
 }
