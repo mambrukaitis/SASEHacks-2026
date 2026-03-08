@@ -102,7 +102,7 @@ class ShoppingList:
         temp = []
         for s in all_results:
             temp.append(Item(s, item))
-            
+
         return all_results
 
 
