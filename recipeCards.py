@@ -68,9 +68,7 @@ class ShoppingList:
         aldi_results = product_to_data.aldi(item)
         tj_results = product_to_data.tj(item)
         p, a, t = None
-        print(item)
-        print(len(publix_results))
-        print(len(tj_results))
+        
         if not publix_results or not aldi_results or not tj_results:
             return Item({}, "")
 
