@@ -11,7 +11,7 @@ class Item:
         self.store = itemDict.get("store")
         self.brand = itemDict.get("brand")
         self.category = i
-        self.selected = True
+        self.selected = False
     
     def to_dict(self):
         return {
@@ -90,35 +90,6 @@ class ShoppingList:
         temp = sorted(temp, key=lambda x: x["price"])
 
         return Item(temp[0], item)
-    
-        
-    
-        # publix_results = product_to_data.publix_search_limited(item)
-        # aldi_results = product_to_data.aldi(item)
-        # tj_results = product_to_data.tj(item)
-        # p, a, t = None
-        # print(item)
-        # print(len(publix_results))
-        # print(len(tj_results))
-        # if not publix_results or not aldi_results or not tj_results:
-        #     return Item({}, "")
-
-        # if(not len(publix_results)):
-        #     p = publix_results[0]
-        # if (not len(aldi_results)):
-        #     a = aldi_results[0]
-        # if(not len(tj_results)):
-        #     t = tj_results[0]
-
-        
-        # if p and p["price"] <= t["price"] and p["price"] <= a["price"]:
-        #     return Item(p, item)
-        # elif t and t["price"] <= p["price"] and t["price"] <= a["price"]:
-        #     return Item(t, item)
-        # else:
-        #     if not a:
-        #         return Item(a, item)
-        # return Item({}, "")
 
 
     def addItemItem(self, item: Item):
@@ -130,31 +101,7 @@ class ShoppingList:
             self.tjs.append(item)
         else:
             self.aldis.append(item)
-    
-        
-    def addItem(self, item: str):
-        publix_results = product_to_data.publix_search_limited(item)
-        aldi_results = product_to_data.aldi(item)
-        tj_results = product_to_data.tj(item)
 
-        if not publix_results or not aldi_results or not tj_results:
-            return
-
-        p = publix_results[0]
-        a = aldi_results[0]
-        t = tj_results[0]
-
-        if p["price"] <= t["price"] and p["price"] <= a["price"]:
-            self.publix.append(Item(p, item))
-            self.remainingBudget -= p["price"]
-        elif t["price"] <= p["price"] and t["price"] <= a["price"]:
-            self.tjs.append(Item(t, item))
-            self.remainingBudget -= t["price"]
-        else:
-            self.aldis.append(Item(a, item))
-            self.remainingBudget -= a["price"]
-
-        self.items.append(item)
 
     def removeItemClass(self, item_name: str):
         # Search each store list for the Item with matching name
