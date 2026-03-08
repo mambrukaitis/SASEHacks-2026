@@ -14,28 +14,19 @@ import {
 import { AppHeader } from '@/components/app-header';
 import { Colors } from '@/constants/Colors';
 import { useBudget } from '@/contexts/budget-context';
-
-const EXPENSE_ITEMS = [
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-  { name: 'Kraft Mac and Cheese', price: 3.98 },
-];
+import { useShoppingList } from '@/contexts/shopping-list-context';
 
 export default function BudgetScreen() {
   const { budget, setBudget } = useBudget();
+  const { items, expensesTotal } = useShoppingList();
   const budgetInputRef = React.useRef<TextInput>(null);
   const [budgetInputValue, setBudgetInputValue] = React.useState(String(budget));
 
-  const total = React.useMemo(
-    () => EXPENSE_ITEMS.reduce((sum, i) => sum + i.price, 0),
-    []
+  const expenseItems = React.useMemo(
+    () => items.filter((i) => i.checked),
+    [items]
   );
+  const total = expensesTotal;
   const remaining = budget - total;
 
   React.useEffect(() => {
@@ -76,12 +67,16 @@ export default function BudgetScreen() {
         <Text style={styles.title}>March Expenses</Text>
 
         <View style={styles.expenseList}>
-          {EXPENSE_ITEMS.map((item, i) => (
-            <View key={i} style={styles.expenseRow}>
-              <Text style={styles.expenseName}>{item.name}</Text>
-              <Text style={styles.expensePrice}>{item.price.toFixed(2)}</Text>
-            </View>
-          ))}
+          {expenseItems.length === 0 ? (
+            <Text style={styles.emptyText}>No expenses yet. Check off items on the Shopping List to add them here.</Text>
+          ) : (
+            expenseItems.map((item) => (
+              <View key={item.id} style={styles.expenseRow}>
+                <Text style={styles.expenseName}>{item.name}</Text>
+                <Text style={styles.expensePrice}>{item.price.toFixed(2)}</Text>
+              </View>
+            ))
+          )}
         </View>
 
         <View style={styles.divider} />
@@ -144,6 +139,13 @@ const styles = StyleSheet.create({
   },
   expenseList: {
     marginBottom: 12,
+  },
+  emptyText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    color: Colors.darkGreen,
+    fontStyle: 'italic',
+    paddingVertical: 16,
   },
   expenseRow: {
     flexDirection: 'row',

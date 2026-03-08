@@ -1,4 +1,3 @@
-import { usePathname } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,12 +10,9 @@ export function AppHeader() {
   const insets = useSafeAreaInsets();
   const topPadding = Math.max(insets.top, 60);
   const { budget } = useBudget();
-  const { totalCost } = useShoppingList();
-  const pathname = usePathname();
-  const isListPage = pathname?.includes('list') ?? false;
-  const displayBudget = isListPage
-    ? (Math.round((budget - totalCost) * 100) / 100).toFixed(2)
-    : String(budget);
+  const { expensesTotal } = useShoppingList();
+  const remaining = Math.round((budget - expensesTotal) * 100) / 100;
+  const displayBudget = remaining.toFixed(2);
 
   return (
     <View style={[styles.header, { paddingTop: topPadding }]}>
