@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import type { BackendShoppingList } from '@/services/api';
 import { getShoppingList, selectItem as apiSelectItem, deselectItem as apiDeselectItem } from '@/services/api';
-import { deleteItem as apiDeleteItem } from '@/services/api';
+import { removeItem as apiDeleteItem } from '@/services/api';
 
 export type StoreName = 'Publix' | 'Aldis' | 'Trader Joes';
 
@@ -120,12 +120,12 @@ export function ShoppingListProvider({ children }: { children: React.ReactNode }
     );
   }, []);
 
-  const deleteItem = React.useCallback((id: string) => {
+  const removeItem = React.useCallback((id: string) => {
   setItems((prev) => {
     const item = prev.find((i) => i.id === id);
 
     if (item) {
-      apiDeleteItem(item.name, item.store).catch(() => {});
+      apiRemoveItem(item.name, item.store).catch(() => {});
     }
 
     return prev.filter((i) => i.id !== id);
