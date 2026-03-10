@@ -1,4 +1,4 @@
-const API_BASE = "http://10.136.194.45:5001";
+const API_BASE = "http://10.138.173.99:5002";
 
 export async function getShoppingList() {
   try {
