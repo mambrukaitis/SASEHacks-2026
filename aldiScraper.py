@@ -14,6 +14,7 @@ def aldiSearch(search: str):
     }
 
     response = requests.get(url, headers=headers)
+    search = " " + search.lower()
 
     data = response.json()
     products = data["data"]
