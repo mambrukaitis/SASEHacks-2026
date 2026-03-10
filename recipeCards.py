@@ -1,4 +1,3 @@
-import json
 import product_to_data
 
 class Item:
