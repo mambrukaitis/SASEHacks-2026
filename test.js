@@ -1,4 +1,4 @@
-const API_BASE = "http://10.136.232.27:5003";
+const API_BASE = "http://10.136.232.27:5001";
 
 export async function getShoppingList() {
   try {
@@ -6,6 +6,7 @@ export async function getShoppingList() {
     if (!res.ok) throw new Error("Failed");
     return await res.json();
   } catch (e) {
+    console.log("API error:", e);
     return null;
   }
 }
@@ -65,10 +66,10 @@ export async function searchItem(name) {
 export async function addItem(name) {
   try {
     const res = await fetch(`${API_BASE}/add_item`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: ingredient })
+  });
     return await res.json();
   } catch (e) {
     return null;
@@ -140,7 +141,7 @@ export async function removeItem(name, store) {
   return await res.json();
 }
 export async function deleteItem(name) {
-  return fetch('/api/delete', {
+  return fetch(`${API_BASE}/delete_item`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name }),
