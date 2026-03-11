@@ -1,7 +1,7 @@
 // test2.js
 const fetch = require('node-fetch');
 
-const API_BASE = "http://10.136.232.27:5001"; // your Flask LAN IP
+const API_BASE = "http://10.136.47.84:5001"; // your Flask LAN IP
 
 async function test() {
   try {

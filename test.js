@@ -1,4 +1,4 @@
-const API_BASE = "http://10.136.232.27:5001";
+const API_BASE = "http://10.136.47.84:5001";
 
 export async function getShoppingList() {
   try {
@@ -16,23 +16,10 @@ export async function addRecipeIngredients(ingredients) {
 
   for (const ingredient of ingredients) {
     try {
-      // Call the search endpoint (optional, if you need to check first)
-      await fetch(`${API_BASE}/search`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: ingredient }),
-      });
-
-      // Call the insert endpoint
-      await fetch(`${API_BASE}/insert`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: ingredient }),
-      });
+      // 1) Ask backend to find the cheapest item for this ingredient
+      await searchItem(ingredient);
+      // 2) Add that temp item to the shopping list
+      await addItem();
     } catch (err) {
       console.error(`Failed to process ingredient "${ingredient}":`, err);
     }
@@ -66,10 +53,8 @@ export async function searchItem(name) {
 export async function addItem(name) {
   try {
     const res = await fetch(`${API_BASE}/add_item`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: ingredient })
-  });
+      method: "POST",
+    });
     return await res.json();
   } catch (e) {
     return null;
@@ -141,11 +126,13 @@ export async function removeItem(name, store) {
   return await res.json();
 }
 export async function deleteItem(name) {
-  return fetch(`${API_BASE}/delete_item`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const res = await fetch(`${API_BASE}/remove_item`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name }),
   });
+
+  return await res.json();
 }
 
 
