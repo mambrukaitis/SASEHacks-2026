@@ -38,6 +38,8 @@ def search_item():
     
     # searchItem returns a single cheapest Item
     tempItem = shopping_list.searchItem(name)
+    if tempItem is None:
+        return jsonify({})
     return jsonify(tempItem.to_dict())
 
 

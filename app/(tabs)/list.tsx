@@ -22,7 +22,17 @@ function storeFromFilter(f: FilterType): StoreName | 'all' {
 }
 
 export default function ListScreen() {
-  const { items, toggleItem, updateItem, removeItem, addItem, totalCost, expensesTotal, refreshFromBackend, clearList } = useShoppingList();
+  const {
+    items,
+    toggleItem,
+    updateItem,
+    removeItem,
+    addItem,
+    totalCost,
+    expensesTotal,
+    refreshFromBackend,
+    clearList,
+  } = useShoppingList();
   const { budget } = useBudget();
   const [selectedFilter, setSelectedFilter] = React.useState<FilterType>('Overall');
   const [modalItem, setModalItem] = React.useState<ShoppingListItem | null | 'new'>(null);
@@ -33,9 +43,7 @@ export default function ListScreen() {
 
   const grouped = React.useMemo(() => {
     const filtered =
-      storeFilter === 'all'
-        ? items
-        : items.filter((i) => i.store === storeFilter);
+      storeFilter === 'all' ? items : items.filter((i) => i.store === storeFilter);
     const groups: Record<StoreName, ShoppingListItem[]> = {
       Publix: [],
       Aldis: [],
@@ -46,6 +54,18 @@ export default function ListScreen() {
     });
     return groups;
   }, [items, storeFilter]);
+
+  // ------------------------------
+  // NEW: Fetch shopping list on mount
+  // ------------------------------
+  React.useEffect(() => {
+    const fetchList = async () => {
+      console.log('Fetching shopping list from backend...');
+      const success = await refreshFromBackend();
+      console.log('Shopping list fetch success:', success);
+    };
+    fetchList();
+  }, []);
 
   const handleItemPress = (item: ShoppingListItem) => {
     setModalItem(item);
@@ -164,17 +184,11 @@ export default function ListScreen() {
         onClose={() => setModalItem(null)}
         onDone={handleDone}
         onDelete={handleDelete}
-        onAddFromSearch={async (name, price) => {
-          const success = await refreshFromBackend();
-          if (!success) {
-            addItem({ name, price, store: 'Publix', checked: false });
-          }
-          setModalItem(null);
-        }}
       />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
